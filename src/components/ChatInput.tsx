@@ -27,10 +27,12 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
   };
 
   return (
-    <div className="relative flex flex-col w-full py-4">
+    <div className="relative w-full max-w-3xl mx-auto">
       <div className="flex items-end gap-2">
         <Textarea
-          className="min-h-10 max-h-36 resize-none bg-secondary/40 border-secondary/40 backdrop-blur-sm rounded-xl transition-all focus-visible:ring-devcon-purple/50"
+          className="min-h-10 max-h-36 resize-none bg-secondary/30 border-secondary/60 
+                    backdrop-blur-sm rounded-xl transition-all focus-visible:ring-devcon-purple/50
+                    shadow-inner text-white placeholder:text-white/50"
           placeholder="Send a message..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
@@ -39,7 +41,8 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
         />
         <Button
           size="icon"
-          className="h-10 w-10 shrink-0 bg-devcon-purple hover:bg-devcon-purple/90 rounded-xl transition-all shadow-lg hover:shadow-devcon-purple/20"
+          className="h-10 w-10 shrink-0 bg-devcon-purple hover:bg-devcon-purple/90 
+                   rounded-xl transition-all shadow-lg hover:shadow-devcon-purple/50"
           onClick={handleSubmit}
           disabled={!message.trim() || isLoading}
         >
@@ -47,7 +50,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
           <span className="sr-only">Send</span>
         </Button>
       </div>
-      <div className="mt-2 text-xs text-center text-muted-foreground">
+      <div className="mt-2 text-xs text-center text-white/60">
         Press Enter to send, Shift+Enter for new line
       </div>
     </div>

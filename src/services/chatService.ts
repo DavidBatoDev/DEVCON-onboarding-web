@@ -10,16 +10,21 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 const modelName = "gemini-1.5-flash";
 
 // Generate a response using the Gemini API
-export const generateBotResponse = async (userMessage: string): Promise<Message> => {
+export const generateBotResponse = async (userMessage: string, memory?: any): Promise<Message> => {
   try {
     // Get the model
     const model = genAI.getGenerativeModel({ model: modelName });
 
-    // Customize how the model should respond
-    const systemPrompt = `You are DEVCON AI assistant. You help users learn about DEVCON, 
+    // Customize how the model should respond based on memory
+    let systemPrompt = `You are DEVCON AI assistant. You help users learn about DEVCON, 
     the Philippines' largest nonprofit volunteer tech community. Respond in a friendly, 
     helpful manner and provide information about DEVCON's initiatives, chapters, and 
     tech-related topics. You may use markdown formatting in your responses.`;
+    
+    // Add memory context if available
+    if (memory?.userName) {
+      systemPrompt += ` The user's name is ${memory.userName}. Remember this and refer to them by name occasionally.`;
+    }
 
     // Create a chat session
     const chat = model.startChat({
