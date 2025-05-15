@@ -7,12 +7,13 @@ import TypingIndicator from './TypingIndicator';
 import { generateBotResponse } from '@/services/chatService';
 import DevconLogo from './DevconLogo';
 import { ArrowLeft } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
-      content: "👋 Hello! I'm DEVCON AI, your developer assistant. Ask me anything about coding, development, or tech concepts!",
+      content: "👋 Hello! I'm DEVCON AI, your developer assistant. Ask me anything about DEVCON, our initiatives, or how you can get involved!",
       role: 'assistant',
       timestamp: new Date()
     }
@@ -41,11 +42,18 @@ const ChatInterface: React.FC = () => {
     setIsTyping(true);
 
     try {
-      // Get bot response
+      // Get bot response using Gemini API
       const botResponse = await generateBotResponse(content);
       setMessages(prevMessages => [...prevMessages, botResponse]);
     } catch (error) {
       console.error('Failed to get response:', error);
+      // Show error toast
+      toast({
+        title: "Error",
+        description: "Failed to get a response from the AI. Please try again.",
+        variant: "destructive",
+      });
+      
       // Add error message
       const errorMessage: Message = {
         id: `error-${Date.now()}`,

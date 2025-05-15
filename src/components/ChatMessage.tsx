@@ -1,5 +1,6 @@
 
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
 
 export interface Message {
@@ -20,15 +21,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest }) => {
     hour: '2-digit', 
     minute: '2-digit' 
   });
-
-  const renderMarkdown = (content: string) => {
-    return (
-      <div 
-        className="markdown-content"
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
-    );
-  };
 
   return (
     <div
@@ -52,7 +44,27 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest }) => {
           <div className="text-xs opacity-70 ml-4">{formattedTime}</div>
         </div>
         <div className="text-sm">
-          {isUser ? message.content : renderMarkdown(message.content)}
+          {isUser ? (
+            message.content
+          ) : (
+            <ReactMarkdown
+              className="prose prose-invert prose-sm max-w-none"
+              components={{
+                pre: ({ node, ...props }) => (
+                  <div className="bg-black/20 rounded-md p-2 my-2 overflow-x-auto">
+                    <pre {...props} />
+                  </div>
+                ),
+                code: ({ node, className, children, ...props }) => (
+                  <code className="bg-black/30 rounded px-1 py-0.5" {...props}>
+                    {children}
+                  </code>
+                )
+              }}
+            >
+              {message.content}
+            </ReactMarkdown>
+          )}
         </div>
       </div>
     </div>
