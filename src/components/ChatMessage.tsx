@@ -47,23 +47,24 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest }) => {
           {isUser ? (
             message.content
           ) : (
-            <ReactMarkdown
-              className="prose prose-invert prose-sm max-w-none"
-              components={{
-                pre: ({ node, ...props }) => (
-                  <div className="bg-black/20 rounded-md p-2 my-2 overflow-x-auto">
-                    <pre {...props} />
-                  </div>
-                ),
-                code: ({ node, className, children, ...props }) => (
-                  <code className="bg-black/30 rounded px-1 py-0.5" {...props}>
-                    {children}
-                  </code>
-                )
-              }}
-            >
-              {message.content}
-            </ReactMarkdown>
+            <div className="prose prose-invert prose-sm max-w-none">
+              <ReactMarkdown
+                components={{
+                  pre: ({ node, ...props }) => (
+                    <div className="bg-black/20 rounded-md p-2 my-2 overflow-x-auto">
+                      <pre {...props} />
+                    </div>
+                  ),
+                  code: ({ node, className, children, ...props }) => (
+                    <code className="bg-black/30 rounded px-1 py-0.5" {...props}>
+                      {children}
+                    </code>
+                  )
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
+            </div>
           )}
         </div>
       </div>
