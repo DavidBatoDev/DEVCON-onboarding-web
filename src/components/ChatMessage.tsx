@@ -25,20 +25,20 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest }) => {
   return (
     <div
       className={cn(
-        "flex w-full mb-4 items-start",
+        "flex w-full mb-6 items-start transition-all animate-fade-in",
         isUser ? "justify-end" : "justify-start"
       )}
     >
       <div
         className={cn(
-          "relative max-w-[80%] md:max-w-[70%] rounded-lg p-4",
+          "relative max-w-[80%] md:max-w-[70%] rounded-2xl p-4 shadow-lg",
           isUser
-            ? "bg-devcon-purple text-white rounded-tr-none"
-            : "bg-secondary text-white rounded-tl-none"
+            ? "bg-devcon-purple text-white rounded-tr-none shadow-devcon-purple/20"
+            : "bg-secondary/60 backdrop-blur-sm text-white rounded-tl-none"
         )}
       >
         <div className="mb-1 flex items-center justify-between">
-          <div className="font-semibold">
+          <div className="font-medium">
             {isUser ? "You" : "DEVCON AI"}
           </div>
           <div className="text-xs opacity-70 ml-4">{formattedTime}</div>
