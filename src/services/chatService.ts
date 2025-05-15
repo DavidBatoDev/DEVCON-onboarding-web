@@ -6,49 +6,36 @@ const RESPONSE_DELAY_MS = 1500;
 
 // Sample responses for the bot to cycle through
 const sampleResponses = [
-  `I'm a simulated Gemini AI assistant. I can help you with coding questions, explain concepts, or assist with technical problems.
+  `I'm DEVCON AI assistant. I can help you learn about DEVCON, the Philippines' largest nonprofit volunteer tech community, and answer your questions about our initiatives, chapters, and tech-related topics.
 
 \`\`\`javascript
-// Here's a sample code snippet
-function greeting(name) {
-  return \`Hello, \${name}! Welcome to DEVCON AI.\`;
+// Join our community with a simple function call
+function joinDEVCON(name, email, skills) {
+  return "Welcome to DEVCON, " + name + "! We're excited to have you join our community.";
 }
-
-console.log(greeting("Developer"));
 \`\`\``,
 
-  "The Gemini API is Google's multimodal AI model that can understand and generate text, images, and code. In this demo, I'm simulating responses, but the real Gemini API can create more dynamic and helpful content.",
+  "For 15 years, DEVCON has been uniting and empowering IT students and professionals nationwide. Our broad chapter reach enables unique collaboration, empowering the tech ecosystem through impactful initiatives and a supportive environment for growth.",
 
-  `Here are some popular programming languages you might be interested in:
+  `DEVCON has several key initiatives you might be interested in:
 
-1. **JavaScript/TypeScript** - For web development
-2. **Python** - For data science and backend
-3. **Rust** - For systems programming
-4. **Go** - For cloud and network services
-5. **Kotlin** - For Android development`,
+1. **Tech Education** - Workshops and training for students
+2. **Community Development** - Supporting local tech ecosystems
+3. **Women in Tech** - Programs to encourage gender diversity
+4. **Environmental Tech** - Using technology for sustainability
+5. **Youth Development** - Mentorship for young tech enthusiasts`,
 
-  `Let me explain how you could structure a React component:
+  `Here's how you can get involved with DEVCON:
 
-\`\`\`jsx
-import React, { useState } from 'react';
-
-const Counter = () => {
-  const [count, setCount] = useState(0);
-  
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>
-        Increment
-      </button>
-    </div>
-  );
-};
-
-export default Counter;
+\`\`\`
+1. Join a local chapter
+2. Volunteer for events
+3. Become a mentor
+4. Participate in hackathons
+5. Attend our annual conference
 \`\`\``,
 
-  "DEVCON is our developer community platform where we share knowledge, collaborate on projects, and stay updated with the latest in tech. This AI assistant is here to help you navigate resources and answer your questions."
+  "DEVCON is the Philippines' largest non-profit volunteer tech community. From kids to campus to educators and women in tech, our inclusive programs ensure you have a space to learn and contribute to a technology-empowered Philippines. Join us in shaping the future of technology!"
 ];
 
 // Get a random response from our sample responses

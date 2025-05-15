@@ -2,8 +2,12 @@
 import React from 'react';
 import ChatInterface from '@/components/ChatInterface';
 
-const Index = () => {
-  return <ChatInterface />;
+const Chat = () => {
+  return (
+    <div className="h-screen">
+      <ChatInterface />
+    </div>
+  );
 };
 
-export default Index;
+export default Chat;

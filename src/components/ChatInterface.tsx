@@ -1,10 +1,12 @@
 
 import React, { useRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import ChatMessage, { Message } from './ChatMessage';
 import ChatInput from './ChatInput';
 import TypingIndicator from './TypingIndicator';
 import { generateBotResponse } from '@/services/chatService';
 import DevconLogo from './DevconLogo';
+import { ArrowLeft } from 'lucide-react';
 
 const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -60,7 +62,13 @@ const ChatInterface: React.FC = () => {
   return (
     <div className="flex flex-col h-screen bg-devcon-background">
       <header className="flex items-center justify-between p-4 border-b border-border">
-        <DevconLogo />
+        <div className="flex items-center gap-4">
+          <Link to="/" className="flex items-center text-muted-foreground hover:text-white transition-colors">
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            <span className="text-sm">Back to Home</span>
+          </Link>
+          <DevconLogo />
+        </div>
         <div className="text-sm text-muted-foreground">AI Developer Assistant</div>
       </header>
       
