@@ -25,8 +25,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest }) => {
   return (
     <div
       className={cn(
-        "flex w-full mb-6 items-start transition-all animate-fade-in",
-        isUser ? "justify-end" : "justify-start"
+        "flex w-full mb-6 items-start transition-all",
+        isUser ? "justify-end" : "justify-start",
+        isLatest ? "animate-fade-in" : ""
       )}
     >
       <div
@@ -34,7 +35,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest }) => {
           "relative max-w-[80%] md:max-w-[70%] rounded-2xl p-4 shadow-lg",
           isUser
             ? "bg-devcon-purple text-white rounded-tr-none shadow-devcon-purple/20"
-            : "bg-secondary/60 backdrop-blur-sm text-white rounded-tl-none"
+            : "bg-secondary/60 backdrop-blur-sm text-white rounded-tl-none",
+          isLatest && !isUser ? "animate-[scale-in_0.3s_ease-out]" : "",
+          isLatest && isUser ? "animate-[slide-in-right_0.2s_ease-out]" : ""
         )}
       >
         <div className="mb-1 flex items-center justify-between">

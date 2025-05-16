@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ChatMessage, { Message } from './ChatMessage';
@@ -167,7 +168,7 @@ const ChatInterface: React.FC = () => {
         messages: [...chatMemory.messages, userMessage].slice(-10)
       };
       
-      // Get bot response using Gemini API, passing the memory context
+      // Get bot response using API, passing the memory context
       const botResponse = await generateBotResponse(
         content, 
         updatedMemory
