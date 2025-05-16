@@ -9,8 +9,15 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 // Configure the model
 const modelName = "gemini-1.5-flash";
 
+interface ChatMemory {
+  userName?: string;
+  userData: Record<string, any>;
+  lastInteraction: Date;
+  messages: Message[];
+}
+
 // Generate a response using the Gemini API
-export const generateBotResponse = async (userMessage: string, memory?: any): Promise<Message> => {
+export const generateBotResponse = async (userMessage: string, memory?: ChatMemory): Promise<Message> => {
   try {
     // Get the model
     const model = genAI.getGenerativeModel({ model: modelName });
@@ -26,18 +33,35 @@ export const generateBotResponse = async (userMessage: string, memory?: any): Pr
       systemPrompt += ` The user's name is ${memory.userName}. Remember this and refer to them by name occasionally.`;
     }
 
-    // Create a chat session
+    // Create a chat history for context
+    const chatHistory = [];
+    
+    // Initialize with system prompt
+    chatHistory.push({
+      role: "user",
+      parts: [{ text: "Introduce yourself briefly" }],
+    });
+    
+    chatHistory.push({
+      role: "model",
+      parts: [{ text: systemPrompt }],
+    });
+    
+    // Add previous messages from memory to provide context, limiting to the last 10
+    if (memory?.messages && memory.messages.length > 0) {
+      const recentMessages = memory.messages.slice(-10); // Get only the last 10 messages
+      
+      recentMessages.forEach(msg => {
+        chatHistory.push({
+          role: msg.role === 'user' ? 'user' : 'model',
+          parts: [{ text: msg.content }]
+        });
+      });
+    }
+
+    // Create a chat session with context
     const chat = model.startChat({
-      history: [
-        {
-          role: "user",
-          parts: [{ text: "Introduce yourself briefly" }],
-        },
-        {
-          role: "model",
-          parts: [{ text: systemPrompt }],
-        },
-      ],
+      history: chatHistory,
       generationConfig: {
         temperature: 0.7,
         topK: 40,

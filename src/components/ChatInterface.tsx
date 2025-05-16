@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ChatMessage, { Message } from './ChatMessage';
@@ -13,6 +14,7 @@ interface ChatMemory {
   userName?: string;
   userData: Record<string, any>;
   lastInteraction: Date;
+  messages: Message[];
 }
 
 const ChatInterface: React.FC = () => {
@@ -21,7 +23,8 @@ const ChatInterface: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [chatMemory, setChatMemory] = useState<ChatMemory>({
     userData: {},
-    lastInteraction: new Date()
+    lastInteraction: new Date(),
+    messages: []
   });
 
   // Initialize chat and load history/memory from localStorage
@@ -31,12 +34,13 @@ const ChatInterface: React.FC = () => {
     
     // Set initial welcome message if no history exists
     if (!savedMessages) {
-      setMessages([{
+      const welcomeMessage: Message = {
         id: 'welcome',
         content: "👋 Hello! I'm DEVCON AI, your developer assistant. Ask me anything about DEVCON, our initiatives, or how you can get involved!",
         role: 'assistant',
         timestamp: new Date()
-      }]);
+      };
+      setMessages([welcomeMessage]);
     } else {
       try {
         const parsedMessages = JSON.parse(savedMessages);
@@ -49,12 +53,13 @@ const ChatInterface: React.FC = () => {
       } catch (error) {
         console.error('Failed to parse saved messages:', error);
         // Set default message if parsing fails
-        setMessages([{
+        const welcomeMessage: Message = {
           id: 'welcome',
           content: "👋 Hello! I'm DEVCON AI, your developer assistant. Ask me anything about DEVCON, our initiatives, or how you can get involved!",
           role: 'assistant',
           timestamp: new Date()
-        }]);
+        };
+        setMessages([welcomeMessage]);
       }
     }
     
@@ -62,15 +67,36 @@ const ChatInterface: React.FC = () => {
     if (savedMemory) {
       try {
         const parsedMemory = JSON.parse(savedMemory);
+        // Ensure messages array exists in memory
+        if (!parsedMemory.messages) {
+          parsedMemory.messages = [];
+        }
+        
         setChatMemory({
           ...parsedMemory,
-          lastInteraction: new Date(parsedMemory.lastInteraction)
+          lastInteraction: new Date(parsedMemory.lastInteraction),
+          messages: parsedMemory.messages.map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp)
+          }))
         });
       } catch (error) {
         console.error('Failed to parse saved memory:', error);
       }
     }
   }, []);
+
+  // Update memory whenever messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      // Update memory with the latest messages (up to 10)
+      setChatMemory(prevMemory => ({
+        ...prevMemory,
+        messages: messages.slice(-10),
+        lastInteraction: new Date()
+      }));
+    }
+  }, [messages]);
 
   // Save messages to local storage whenever they change
   useEffect(() => {
@@ -136,10 +162,16 @@ const ChatInterface: React.FC = () => {
     const extractedName = extractUserInfo(content);
     
     try {
+      // Update chatMemory with the user message before sending to API
+      const updatedMemory = {
+        ...chatMemory,
+        messages: [...chatMemory.messages, userMessage].slice(-10)
+      };
+      
       // Get bot response using Gemini API, passing the memory context
       const botResponse = await generateBotResponse(
         content, 
-        chatMemory
+        updatedMemory
       );
       
       // Update memory with last interaction
