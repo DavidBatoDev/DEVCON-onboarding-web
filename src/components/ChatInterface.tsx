@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ChatMessage, { Message } from './ChatMessage';
@@ -16,7 +15,6 @@ interface ChatMemory {
   lastInteraction: Date;
   messages: Message[];
 }
-
 const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -31,7 +29,7 @@ const ChatInterface: React.FC = () => {
   useEffect(() => {
     const savedMessages = localStorage.getItem('devcon-chat-history');
     const savedMemory = localStorage.getItem('devcon-chat-memory');
-    
+
     // Set initial welcome message if no history exists
     if (!savedMessages) {
       const welcomeMessage: Message = {
@@ -62,7 +60,7 @@ const ChatInterface: React.FC = () => {
         setMessages([welcomeMessage]);
       }
     }
-    
+
     // Load memory if exists
     if (savedMemory) {
       try {
@@ -71,7 +69,6 @@ const ChatInterface: React.FC = () => {
         if (!parsedMemory.messages) {
           parsedMemory.messages = [];
         }
-        
         setChatMemory({
           ...parsedMemory,
           lastInteraction: new Date(parsedMemory.lastInteraction),
@@ -104,16 +101,16 @@ const ChatInterface: React.FC = () => {
       localStorage.setItem('devcon-chat-history', JSON.stringify(messages));
     }
   }, [messages]);
-  
+
   // Save memory to local storage whenever it changes
   useEffect(() => {
     localStorage.setItem('devcon-chat-memory', JSON.stringify(chatMemory));
   }, [chatMemory]);
-
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: 'smooth'
+    });
   };
-
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
@@ -121,14 +118,7 @@ const ChatInterface: React.FC = () => {
   // Extract user name from messages
   const extractUserInfo = (content: string) => {
     // Check for name introduction patterns
-    const nameIntroPatterns = [
-      /my name is (\w+)/i,
-      /i am (\w+)/i,
-      /i'm (\w+)/i,
-      /call me (\w+)/i,
-      /name's (\w+)/i
-    ];
-
+    const nameIntroPatterns = [/my name is (\w+)/i, /i am (\w+)/i, /i'm (\w+)/i, /call me (\w+)/i, /name's (\w+)/i];
     for (const pattern of nameIntroPatterns) {
       const match = content.match(pattern);
       if (match && match[1]) {
@@ -142,10 +132,8 @@ const ChatInterface: React.FC = () => {
         return name;
       }
     }
-    
     return null;
   };
-
   const handleSendMessage = async (content: string) => {
     // Add user message
     const userMessage: Message = {
@@ -154,26 +142,21 @@ const ChatInterface: React.FC = () => {
       role: 'user',
       timestamp: new Date()
     };
-    
     setMessages(prevMessages => [...prevMessages, userMessage]);
     setIsTyping(true);
 
     // Process message for potential user information
     const extractedName = extractUserInfo(content);
-    
     try {
       // Update chatMemory with the user message before sending to API
       const updatedMemory = {
         ...chatMemory,
         messages: [...chatMemory.messages, userMessage].slice(-10)
       };
-      
+
       // Get bot response using API, passing the memory context
-      const botResponse = await generateBotResponse(
-        content, 
-        updatedMemory
-      );
-      
+      const botResponse = await generateBotResponse(content, updatedMemory);
+
       // Update memory with last interaction
       setChatMemory(prev => ({
         ...prev,
@@ -185,10 +168,7 @@ const ChatInterface: React.FC = () => {
         const name = extractedName || chatMemory.userName;
         const personalizedResponse = {
           ...botResponse,
-          content: botResponse.content.replace(
-            /^(Hi|Hello|Hey)( there)?!/i, 
-            `$1${name ? ` ${name}` : ''}!`
-          )
+          content: botResponse.content.replace(/^(Hi|Hello|Hey)( there)?!/i, `$1${name ? ` ${name}` : ''}!`)
         };
         setMessages(prevMessages => [...prevMessages, personalizedResponse]);
       } else {
@@ -200,9 +180,9 @@ const ChatInterface: React.FC = () => {
       toast({
         title: "Error",
         description: "Failed to get a response from the AI. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
-      
+
       // Add error message
       const errorMessage: Message = {
         id: `error-${Date.now()}`,
@@ -224,15 +204,15 @@ const ChatInterface: React.FC = () => {
       role: 'assistant',
       timestamp: new Date()
     }]);
-    
+
     // Reset memory but keep the username if available
     setChatMemory({
-      userName: chatMemory.userName, // Preserve the username
+      userName: chatMemory.userName,
+      // Preserve the username
       userData: {},
       lastInteraction: new Date(),
       messages: [] // Add the missing messages property as an empty array
     });
-    
     localStorage.removeItem('devcon-chat-history');
     localStorage.setItem('devcon-chat-memory', JSON.stringify({
       userName: chatMemory.userName,
@@ -240,15 +220,12 @@ const ChatInterface: React.FC = () => {
       lastInteraction: new Date(),
       messages: [] // Also add here
     }));
-    
     toast({
       title: "Chat Cleared",
-      description: "Your conversation history has been cleared.",
+      description: "Your conversation history has been cleared."
     });
   };
-
-  return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-devcon-background to-devcon-background/90">
+  return <div className="flex flex-col h-screen bg-gradient-to-b from-devcon-background to-devcon-background/90">
       <header className="flex items-center justify-between px-4 py-3 border-b border-border backdrop-blur-md bg-black/30 shadow-md">
         <div className="flex items-center gap-4">
           <Link to="/" className="flex items-center text-muted-foreground hover:text-white transition-colors">
@@ -257,13 +234,8 @@ const ChatInterface: React.FC = () => {
           </Link>
           <DevconLogo />
         </div>
-        <div className="text-sm font-medium text-white/80">
-          {chatMemory.userName ? `Chatting with ${chatMemory.userName}` : 'AI Developer Assistant'}
-        </div>
-        <button 
-          onClick={clearChatHistory}
-          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-white transition-colors bg-black/20 px-3 py-1 rounded-full"
-        >
+        
+        <button onClick={clearChatHistory} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-white transition-colors bg-black/20 px-3 py-1 rounded-full">
           <Trash2 className="h-3.5 w-3.5" />
           <span>Clear Chat</span>
         </button>
@@ -271,13 +243,7 @@ const ChatInterface: React.FC = () => {
       
       <div className="flex-1 overflow-y-auto p-4">
         <div className="max-w-3xl mx-auto space-y-6">
-          {messages.map((message, index) => (
-            <ChatMessage 
-              key={message.id} 
-              message={message} 
-              isLatest={index === messages.length - 1}
-            />
-          ))}
+          {messages.map((message, index) => <ChatMessage key={message.id} message={message} isLatest={index === messages.length - 1} />)}
           {isTyping && <TypingIndicator />}
           <div ref={messagesEndRef} />
         </div>
@@ -288,8 +254,6 @@ const ChatInterface: React.FC = () => {
           <ChatInput onSendMessage={handleSendMessage} isLoading={isTyping} />
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default ChatInterface;
