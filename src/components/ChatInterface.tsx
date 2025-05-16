@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ChatMessage, { Message } from './ChatMessage';
@@ -229,14 +228,16 @@ const ChatInterface: React.FC = () => {
     setChatMemory({
       userName: chatMemory.userName, // Preserve the username
       userData: {},
-      lastInteraction: new Date()
+      lastInteraction: new Date(),
+      messages: [] // Add the missing messages property as an empty array
     });
     
     localStorage.removeItem('devcon-chat-history');
     localStorage.setItem('devcon-chat-memory', JSON.stringify({
       userName: chatMemory.userName,
       userData: {},
-      lastInteraction: new Date()
+      lastInteraction: new Date(),
+      messages: [] // Also add here
     }));
     
     toast({
