@@ -4,8 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import DevconLogo from '@/components/DevconLogo';
-import { ArrowRight, Star, Layout, Hexagon, CalendarClock, Info, Bulb, MapPin, Mail } from 'lucide-react';
-import { 
+import {
+  ArrowRight,
+  Star,
+  Layout,
+  Hexagon,
+  CalendarClock,
+  Info,
+  Lightbulb, // ✅ Replace Bulb with Lightbulb
+  MapPin,
+  Mail
+} from 'lucide-react';import { 
   Carousel,
   CarouselContent,
   CarouselItem,
@@ -140,7 +149,7 @@ const Landing: React.FC = () => {
               Est. 2009 • 15 Years of Excellence
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-              THE PHILIPPINES' LARGEST
+              THE PHILIPPINES' LEADING
               <span className="bg-gradient-to-r from-devcon-yellow to-devcon-orange bg-clip-text text-transparent"> NONPROFIT TECH COMMUNITY</span>
             </h1>
             <p className="text-white/80 text-lg md:text-xl">
@@ -163,26 +172,47 @@ const Landing: React.FC = () => {
           </div>
           
           <div className="bg-gradient-to-br from-devcon-purple/80 to-devcon-purple/50 rounded-2xl p-6 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl transition-all duration-300">
-            <div className="aspect-[4/3] relative overflow-hidden rounded-lg mb-4">
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-devcon-purple/60 to-devcon-background/80">
-                <DevconLogo className="scale-[2.5] transform-gpu" />
-                <div className="absolute top-4 right-4 bg-devcon-yellow text-black px-3 py-1 rounded-full font-bold text-sm animate-pulse">
-                  we are fifteen
-                </div>
-              </div>
+          <div className="aspect-[4/3] relative overflow-hidden rounded-lg mb-4">
+            <div className="absolute inset-0 bg-gradient-to-br from-devcon-purple/60 to-devcon-background/80"></div>
+
+            {/* DEVCON logo */}
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <DevconLogo className="scale-[2.5]" />
             </div>
+
+            {/* Tag top right */}
+            <div className="absolute top-4 right-4 bg-devcon-yellow text-black px-3 py-1 rounded-full font-bold text-sm animate-pulse z-10">
+              we are fifteen
+            </div>
+
+            {/* Your new image under the logo */}
+            <div className="absolute inset-0 flex items-center justify-center z-0">
+              <img
+                src="/devcon-event-banner.png"
+                alt="Event Scene"
+                className="w-full h-full object-cover opacity-30"
+              />
+            </div>
+          </div>
             
             <Carousel className="w-full">
               <CarouselContent>
-                {Array(3).fill(0).map((_, i) => (
-                  <CarouselItem key={i} className="basis-1/3">
-                    <Card className="bg-devcon-background/30 border-white/5">
-                      <CardContent className="p-2 aspect-video flex items-center justify-center">
-                        <span className="text-white/50 text-xs">Event {i+1}</span>
-                      </CardContent>
-                    </Card>
-                  </CarouselItem>
-                ))}
+              {['event1.png', 'event2.png', 'event3.png'].map((img, i) => (
+                <CarouselItem key={i} className="basis-1/3">
+                  <Card className="group relative overflow-hidden aspect-video rounded-xl border border-white/5">
+                    <CardContent className="p-0 aspect-video">
+                      <img
+                        src={`/${img}`}
+                        alt={`Event ${i + 1}`}
+                        className="w-full h-full object-cover object-center"
+                      />
+                      <div className="absolute inset-0 backdrop-blur-sm bg-devcon-purple/40 group-hover:backdrop-blur-0 group-hover:bg-transparent transition-all duration-300">
+                        
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+              ))}
               </CarouselContent>
             </Carousel>
           </div>
@@ -264,7 +294,7 @@ const Landing: React.FC = () => {
       <section id="initiatives" ref={initiativesRef} className="px-6 py-24 max-w-7xl mx-auto opacity-0">
         <div className="flex items-center gap-3 mb-8">
           <div className="p-3 rounded-full bg-devcon-yellow text-black">
-            <Bulb size={24} />
+            <Lightbulb size={24} />
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-white">Our Initiatives</h2>
         </div>
