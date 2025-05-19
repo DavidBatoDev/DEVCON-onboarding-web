@@ -150,10 +150,10 @@ const Landing: React.FC = () => {
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
               WELCOME TO DEVCON'S
-              <span className="bg-gradient-to-r from-devcon-yellow to-devcon-orange bg-clip-text text-transparent"> MENTORSHIP AND TRAINING</span>
+              <span className="bg-gradient-to-r from-devcon-yellow to-devcon-orange bg-clip-text text-transparent"> OFFICERS ONBOARDING BOT</span>
             </h1>
             <p className="text-white/80 text-lg md:text-xl">
-              Kickstart your journey in tech with DEVCON. As an intern, you'll explore real projects, connect with mentors, and grow your skills in a collaborative environment.
+              Kickstart your journey in tech with DEVCON. As an officer, you'll explore real projects, connect with mentors, and grow your skills in a collaborative environment.
             </p>
             <div className="pt-4">
               <Button 
@@ -181,14 +181,11 @@ const Landing: React.FC = () => {
             </div>
 
             {/* Tag top right */}
-            <div className="absolute top-4 right-4 bg-devcon-yellow text-black px-3 py-1 rounded-full font-bold text-sm animate-pulse z-10">
-              we are fifteen
-            </div>
 
-            {/* Your new image under the logo */}
+            {/* Your new image under the logo */} 
             <div className="absolute inset-0 flex items-center justify-center z-0">
               <img
-                src="/devcon-event-banner.png"
+                src="/devcon-interns.png"
                 alt="Event Scene"
                 className="w-full h-full object-cover opacity-30"
               />
@@ -518,7 +515,7 @@ const Landing: React.FC = () => {
             <div className="mb-6 md:mb-0">
               <DevconLogo className="scale-100" />
               <p className="text-white/60 mt-4 max-w-md">
-                Developers Connect Philippines (DEVCON) is the premier community of developers and innovators in the Philippines.
+                Developers' Conference Philippines (DEVCON) is the premier community of developers and innovators in the Philippines.
               </p>
             </div>
             <div className="flex flex-col items-center md:items-end">

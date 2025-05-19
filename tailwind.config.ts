@@ -115,6 +115,7 @@ export default {
 				typing: 'typing 1.5s steps(40, end)',
                 'fade-in': 'fadeIn 0.3s ease-out',
 			}
+			
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
