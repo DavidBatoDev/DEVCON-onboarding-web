@@ -77,8 +77,8 @@ const Landing: React.FC = () => {
   // Initiatives data
   const initiatives = [
     {
-      title: "DEVCON Intership",
-      description: "An Intership program that connects students with industry professionals for a 3-month learning journey.",
+      title: "DEVCON Internship",
+      description: "An Internship program that connects students with industry professionals for a 3-month learning journey.",
       image: "/DEVCON_intership.png"
     },
     {
