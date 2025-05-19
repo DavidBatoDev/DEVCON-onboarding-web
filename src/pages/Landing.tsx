@@ -150,17 +150,17 @@ const Landing: React.FC = () => {
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
               WELCOME TO DEVCON'S
-              <span className="bg-gradient-to-r from-devcon-yellow to-devcon-orange bg-clip-text text-transparent"> OFFICERS ONBOARDING BOT</span>
+              <span className="bg-gradient-to-r from-devcon-yellow to-devcon-orange bg-clip-text text-transparent"> OFFICERS' ONBOARDING BOT</span>
             </h1>
             <p className="text-white/80 text-lg md:text-xl">
-              Kickstart your journey in tech with DEVCON. As an officer, you'll explore real projects, connect with mentors, and grow your skills in a collaborative environment.
+              Start strong with the DEVCON Chapter Officers’ Onboarding Bot — your go-to guide for leading a successful chapter. Kickstart your journey in tech with DEVCON. 
             </p>
             <div className="pt-4">
               <Button 
                 onClick={handleStartChat}
                 className="bg-devcon-yellow hover:bg-devcon-yellow/90 text-black font-bold text-lg px-8 py-6 h-auto group transition-all duration-300 hover:shadow-[0_0_15px_rgba(248,210,53,0.5)]"
               >
-                <span>ASK OUR AI ASSISTANT</span>
+                <span>GET STARTED</span>
                 <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
