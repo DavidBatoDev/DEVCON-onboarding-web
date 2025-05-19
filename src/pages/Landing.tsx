@@ -4,8 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import DevconLogo from '@/components/DevconLogo';
-import { ArrowRight, Star, Layout, Hexagon, CalendarClock, Info, Bulb, MapPin, Mail } from 'lucide-react';
-import { 
+import {
+  ArrowRight,
+  Star,
+  Layout,
+  Hexagon,
+  CalendarClock,
+  Info,
+  Lightbulb, // ✅ Replace Bulb with Lightbulb
+  MapPin,
+  Mail
+} from 'lucide-react';import { 
   Carousel,
   CarouselContent,
   CarouselItem,
@@ -60,27 +69,27 @@ const Landing: React.FC = () => {
   // Achievements data
   const achievements = [
     { icon: Star, title: "15+ Years", description: "Serving the tech community" },
-    { icon: Layout, title: "30+ Chapters", description: "Nationwide presence" },
-    { icon: Hexagon, title: "10,000+", description: "Members and growing" },
-    { icon: CalendarClock, title: "100+ Events", description: "Annually conducted" },
+    { icon: Layout, title: "11+ Chapters", description: "Nationwide presence" },
+    { icon: Hexagon, title: "100,000+", description: "Members and growing" },
+    { icon: CalendarClock, title: "50+ Events", description: "Annually conducted" },
   ];
 
   // Initiatives data
   const initiatives = [
     {
-      title: "DevCon Fellowship",
-      description: "A mentorship program that connects students with industry professionals for a 3-month learning journey.",
-      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=500&auto=format&fit=crop"
+      title: "DEVCON Intership",
+      description: "An Intership program that connects students with industry professionals for a 3-month learning journey.",
+      image: "/DEVCON_intership.png"
     },
     {
-      title: "Women in Tech",
+      title: "She is DEVCON",
       description: "Supporting and empowering women in the tech industry through workshops, networking events, and mentorship.",
-      image: "https://images.unsplash.com/photo-1573164574572-cb89e39749b4?q=80&w=500&auto=format&fit=crop"
+      image: "/She_is_DEVCON.jpg"
     },
     {
       title: "Code Camp",
       description: "Intensive coding bootcamps that prepare participants for the demands of the tech industry.",
-      image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=500&auto=format&fit=crop"
+      image: "/DEVCON_codecamp.png"
     }
   ];
 
@@ -126,7 +135,7 @@ const Landing: React.FC = () => {
             onClick={handleStartChat} 
             className="bg-devcon-yellow/90 hover:bg-devcon-yellow text-black font-medium text-sm py-2 h-auto group transition-all duration-300"
           >
-            Try AI Assistant
+            Ask Our AI Assistant
             <ArrowRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
@@ -140,18 +149,18 @@ const Landing: React.FC = () => {
               Est. 2009 • 15 Years of Excellence
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-              THE PHILIPPINES' LARGEST
-              <span className="bg-gradient-to-r from-devcon-yellow to-devcon-orange bg-clip-text text-transparent"> NONPROFIT TECH COMMUNITY</span>
+              WELCOME TO DEVCON'S
+              <span className="bg-gradient-to-r from-devcon-yellow to-devcon-orange bg-clip-text text-transparent"> MENTORSHIP AND TRAINING</span>
             </h1>
             <p className="text-white/80 text-lg md:text-xl">
-              For 15 years, DEVCON has been uniting and empowering IT students and professionals nationwide. Our broad chapter reach enables unique collaboration through impactful initiatives.
+              Kickstart your journey in tech with DEVCON. As an intern, you'll explore real projects, connect with mentors, and grow your skills in a collaborative environment.
             </p>
             <div className="pt-4">
               <Button 
                 onClick={handleStartChat}
                 className="bg-devcon-yellow hover:bg-devcon-yellow/90 text-black font-bold text-lg px-8 py-6 h-auto group transition-all duration-300 hover:shadow-[0_0_15px_rgba(248,210,53,0.5)]"
               >
-                <span>TRY OUR AI ASSISTANT</span>
+                <span>ASK OUR AI ASSISTANT</span>
                 <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
@@ -163,26 +172,47 @@ const Landing: React.FC = () => {
           </div>
           
           <div className="bg-gradient-to-br from-devcon-purple/80 to-devcon-purple/50 rounded-2xl p-6 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl transition-all duration-300">
-            <div className="aspect-[4/3] relative overflow-hidden rounded-lg mb-4">
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-devcon-purple/60 to-devcon-background/80">
-                <DevconLogo className="scale-[2.5] transform-gpu" />
-                <div className="absolute top-4 right-4 bg-devcon-yellow text-black px-3 py-1 rounded-full font-bold text-sm animate-pulse">
-                  we are fifteen
-                </div>
-              </div>
+          <div className="aspect-[4/3] relative overflow-hidden rounded-lg mb-4">
+            <div className="absolute inset-0 bg-gradient-to-br from-devcon-purple/60 to-devcon-background/80"></div>
+
+            {/* DEVCON logo */}
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <DevconLogo className="scale-[2.5]" />
             </div>
+
+            {/* Tag top right */}
+            <div className="absolute top-4 right-4 bg-devcon-yellow text-black px-3 py-1 rounded-full font-bold text-sm animate-pulse z-10">
+              we are fifteen
+            </div>
+
+            {/* Your new image under the logo */}
+            <div className="absolute inset-0 flex items-center justify-center z-0">
+              <img
+                src="/devcon-event-banner.png"
+                alt="Event Scene"
+                className="w-full h-full object-cover opacity-30"
+              />
+            </div>
+          </div>
             
             <Carousel className="w-full">
               <CarouselContent>
-                {Array(3).fill(0).map((_, i) => (
-                  <CarouselItem key={i} className="basis-1/3">
-                    <Card className="bg-devcon-background/30 border-white/5">
-                      <CardContent className="p-2 aspect-video flex items-center justify-center">
-                        <span className="text-white/50 text-xs">Event {i+1}</span>
-                      </CardContent>
-                    </Card>
-                  </CarouselItem>
-                ))}
+              {['event1.png', 'event2.png', 'event3.png'].map((img, i) => (
+                <CarouselItem key={i} className="basis-1/3">
+                  <Card className="group relative overflow-hidden aspect-video rounded-xl border border-white/5">
+                    <CardContent className="p-0 aspect-video">
+                      <img
+                        src={`/${img}`}
+                        alt={`Event ${i + 1}`}
+                        className="w-full h-full object-cover object-center"
+                      />
+                      <div className="absolute inset-0 backdrop-blur-sm bg-devcon-purple/40 group-hover:backdrop-blur-0 group-hover:bg-transparent transition-all duration-300">
+                        
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+              ))}
               </CarouselContent>
             </Carousel>
           </div>
@@ -221,7 +251,7 @@ const Landing: React.FC = () => {
           <div className="space-y-6">
             <div className="text-white/80 space-y-4">
               <p className="text-lg">
-                Developers Connect (DevCon) is the premier organization of professional developers in the Philippines. It was founded in 2009 to create a sustainable community of developers and innovators across the country.
+                Developers Connect (DEVCON) is the premier organization of professional developers in the Philippines. It was founded in 2009 to create a sustainable community of developers and innovators across the country.
               </p>
               <p>
                 For 15 years, we've been building connections between students, professionals, and tech companies, fostering knowledge exchange and professional growth through various initiatives.
@@ -264,7 +294,7 @@ const Landing: React.FC = () => {
       <section id="initiatives" ref={initiativesRef} className="px-6 py-24 max-w-7xl mx-auto opacity-0">
         <div className="flex items-center gap-3 mb-8">
           <div className="p-3 rounded-full bg-devcon-yellow text-black">
-            <Bulb size={24} />
+            <Lightbulb size={24} />
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-white">Our Initiatives</h2>
         </div>
@@ -397,7 +427,7 @@ const Landing: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-white/60 text-sm">Email</p>
-                  <p className="text-white font-medium">info@devcon.ph</p>
+                  <p className="text-white font-medium">hello@devcon.ph</p>
                 </div>
               </div>
               
@@ -407,7 +437,7 @@ const Landing: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-white/60 text-sm">Address</p>
-                  <p className="text-white font-medium">Makati City, Philippines</p>
+                  <p className="text-white font-medium">The Orient Square, Pasig City, Philippines</p>
                 </div>
               </div>
 
