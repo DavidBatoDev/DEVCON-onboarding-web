@@ -34,7 +34,7 @@ const ChatInterface: React.FC = () => {
     if (!savedMessages) {
       const welcomeMessage: Message = {
         id: 'welcome',
-        content: "👋 Hello! I'm DEVCON AI, your developer assistant. Ask me anything about DEVCON, our initiatives, or how you can get involved!",
+        content: "👋 Hello, Welcome aboard the DEVCON Chapter Officers’ Onboarding Bot — your cheerful sidekick on this exciting tech adventure!",
         role: 'assistant',
         timestamp: new Date()
       };
@@ -53,7 +53,7 @@ const ChatInterface: React.FC = () => {
         // Set default message if parsing fails
         const welcomeMessage: Message = {
           id: 'welcome',
-          content: "👋 Hello! I'm DEVCON AI, your developer assistant. Ask me anything about DEVCON, our initiatives, or how you can get involved!",
+          content: "👋 Hello, Welcome aboard the DEVCON Chapter Officers’ Onboarding Bot — your cheerful sidekick on this exciting tech adventure!",
           role: 'assistant',
           timestamp: new Date()
         };
@@ -200,7 +200,7 @@ const ChatInterface: React.FC = () => {
   const clearChatHistory = () => {
     setMessages([{
       id: 'welcome',
-      content: "👋 Hello! I'm DEVCON AI, your developer assistant. Ask me anything about DEVCON, our initiatives, or how you can get involved!",
+      content: "👋 Hello! Welcome aboard the DEVCON Chapter Officers’ Onboarding Bot — your cheerful sidekick on this exciting tech adventure! 💻✨",
       role: 'assistant',
       timestamp: new Date()
     }]);

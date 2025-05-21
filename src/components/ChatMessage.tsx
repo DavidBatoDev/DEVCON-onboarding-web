@@ -51,22 +51,38 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest }) => {
             message.content
           ) : (
             <div className="prose prose-invert prose-sm max-w-none">
-              <ReactMarkdown
-                components={{
-                  pre: ({ node, ...props }) => (
-                    <div className="bg-black/20 rounded-md p-2 my-2 overflow-x-auto">
-                      <pre {...props} />
-                    </div>
-                  ),
-                  code: ({ node, className, children, ...props }) => (
-                    <code className="bg-black/30 rounded px-1 py-0.5" {...props}>
-                      {children}
-                    </code>
-                  )
-                }}
-              >
-                {message.content}
-              </ReactMarkdown>
+        <ReactMarkdown
+          components={{
+            pre: ({ node, ...props }) => (
+              <div className="bg-black/20 rounded-md p-2 my-2 overflow-x-auto">
+                <pre {...props} />
+              </div>
+            ),
+            code: ({ node, className, children, ...props }) => (
+              <code className="bg-black/30 rounded px-1 py-0.5" {...props}>
+                {children}
+              </code>
+            ),
+            ul: ({ children, ...props }) => (
+              <ul className="list-disc pl-5 my-2 space-y-1" {...props}>
+                {children}
+              </ul>
+            ),
+            ol: ({ children, ...props }) => (
+              <ol className="list-decimal pl-5 my-2 space-y-1" {...props}>
+                {children}
+              </ol>
+            ),
+            li: ({ children, ...props }) => (
+              <li className="text-white/90" {...props}>
+                {children}
+              </li>
+            )
+          }}
+        >
+          {message.content}
+        </ReactMarkdown>
+
             </div>
           )}
         </div>

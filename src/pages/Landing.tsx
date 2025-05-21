@@ -77,8 +77,8 @@ const Landing: React.FC = () => {
   // Initiatives data
   const initiatives = [
     {
-      title: "DEVCON Intership",
-      description: "An Intership program that connects students with industry professionals for a 3-month learning journey.",
+      title: "DEVCON Internship",
+      description: "An Internship program that connects students with industry professionals for a 3-month learning journey.",
       image: "/DEVCON_intership.png"
     },
     {
@@ -150,17 +150,17 @@ const Landing: React.FC = () => {
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
               WELCOME TO DEVCON'S
-              <span className="bg-gradient-to-r from-devcon-yellow to-devcon-orange bg-clip-text text-transparent"> MENTORSHIP AND TRAINING</span>
+              <span className="bg-gradient-to-r from-devcon-yellow to-devcon-orange bg-clip-text text-transparent"> OFFICERS' ONBOARDING BOT</span>
             </h1>
             <p className="text-white/80 text-lg md:text-xl">
-              Kickstart your journey in tech with DEVCON. As an intern, you'll explore real projects, connect with mentors, and grow your skills in a collaborative environment.
+              Start strong with the DEVCON Chapter Officers’ Onboarding Bot — your go-to guide for leading a successful chapter. Kickstart your journey in tech with DEVCON. 
             </p>
             <div className="pt-4">
               <Button 
                 onClick={handleStartChat}
                 className="bg-devcon-yellow hover:bg-devcon-yellow/90 text-black font-bold text-lg px-8 py-6 h-auto group transition-all duration-300 hover:shadow-[0_0_15px_rgba(248,210,53,0.5)]"
               >
-                <span>ASK OUR AI ASSISTANT</span>
+                <span>GET STARTED</span>
                 <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
@@ -181,14 +181,11 @@ const Landing: React.FC = () => {
             </div>
 
             {/* Tag top right */}
-            <div className="absolute top-4 right-4 bg-devcon-yellow text-black px-3 py-1 rounded-full font-bold text-sm animate-pulse z-10">
-              we are fifteen
-            </div>
 
-            {/* Your new image under the logo */}
+            {/* Your new image under the logo */} 
             <div className="absolute inset-0 flex items-center justify-center z-0">
               <img
-                src="/devcon-event-banner.png"
+                src="/devcon-interns.png"
                 alt="Event Scene"
                 className="w-full h-full object-cover opacity-30"
               />
@@ -518,7 +515,7 @@ const Landing: React.FC = () => {
             <div className="mb-6 md:mb-0">
               <DevconLogo className="scale-100" />
               <p className="text-white/60 mt-4 max-w-md">
-                Developers Connect Philippines (DEVCON) is the premier community of developers and innovators in the Philippines.
+                Developers' Conference Philippines (DEVCON) is the premier community of developers and innovators in the Philippines.
               </p>
             </div>
             <div className="flex flex-col items-center md:items-end">
