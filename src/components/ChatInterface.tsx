@@ -33,8 +33,20 @@ const ChatInterface: React.FC = () => {
     // Set initial welcome message if no history exists
     if (!savedMessages) {
       const welcomeMessage: Message = {
-        id: 'welcome',
-        content: "👋 Hello, Welcome aboard the DEVCON Chapter Officers’ Onboarding Bot — your cheerful sidekick on this exciting tech adventure!",
+      id: 'welcome',
+      content: [
+        "**🎉 Hey there, Officer! 🎉**",
+        "Welcome aboard the **DEVCON Chapter Officers’ Onboarding Bot** — your cheerful sidekick on this exciting tech adventure! 💻✨",
+        "",
+        "I’m here to help you kickstart your journey with:",
+        "- 📋 **Checklists** to keep you on track",
+        "- 📚 **Guides and best practices**",
+        "- 🛠️ **Tools** to lead your chapter smoothly",
+        "- 🎯 **Tips** to turn ideas into action",
+        "",
+        "So buckle up, future tech leader — your chapter is waiting, and I’ve got your back every step of the way.",
+        "**Ready to roll? Let’s do this! 🚀😄**"
+      ].join("\n"),
         role: 'assistant',
         timestamp: new Date()
       };
@@ -200,7 +212,19 @@ const ChatInterface: React.FC = () => {
   const clearChatHistory = () => {
     setMessages([{
       id: 'welcome',
-      content: "👋 Hello! Welcome aboard the DEVCON Chapter Officers’ Onboarding Bot — your cheerful sidekick on this exciting tech adventure! 💻✨",
+      content: [
+        "**🎉 Hey there, Officer! 🎉**",
+        "Welcome aboard the **DEVCON Chapter Officers’ Onboarding Bot** — your cheerful sidekick on this exciting tech adventure! 💻✨",
+        "",
+        "I’m here to help you kickstart your journey with:",
+        "- 📋 **Checklists** to keep you on track",
+        "- 📚 **Guides and best practices**",
+        "- 🛠️ **Tools** to lead your chapter smoothly",
+        "- 🎯 **Tips** to turn ideas into action",
+        "",
+        "So buckle up, future tech leader — your chapter is waiting, and I’ve got your back every step of the way.",
+        "**Ready to roll? Let’s do this! 🚀😄**"
+      ].join("\n"),
       role: 'assistant',
       timestamp: new Date()
     }]);

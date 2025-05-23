@@ -54,9 +54,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest }) => {
         <ReactMarkdown
           components={{
             pre: ({ node, ...props }) => (
-              <div className="bg-black/20 rounded-md p-2 my-2 overflow-x-auto">
-                <pre {...props} />
-              </div>
+            <div className="bg-transparent p-0 m-0">
+              <pre {...props} className="text-white whitespace-pre-wrap break-words font-normal text-sm leading-relaxed" />
+            </div>
             ),
             code: ({ node, className, children, ...props }) => (
               <code className="bg-black/30 rounded px-1 py-0.5" {...props}>
