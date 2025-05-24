@@ -3,18 +3,16 @@ from app.services.embedder import get_embedder
 from app.core.config import settings
 from openai import OpenAI
 
-# Configure OpenAI API key
+# Initialize OpenAI client
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
-# Initialize components
+# Initialize embedder and vector store
 embedder = get_embedder()
 vector_store = load_from_store()
-
 
 def retrieve_relevant_chunks(query: str, top_k: int = 3):
     query_emb = embedder.encode(query).tolist()
     return vector_store.similarity_search(query_emb, top_k=top_k)
-
 
 def get_openai_response(query: str, context: str) -> str:
     response = client.chat.completions.create(
@@ -24,24 +22,21 @@ def get_openai_response(query: str, context: str) -> str:
                 "role": "system",
                 "content": "You are a helpful assistant answering questions based on internal DEVCON documents.",
             },
-            {"role": "user", "content": f"{context}\n\nQuestion: {query}"},
+            {
+                "role": "user",
+                "content": f"{context}\n\nQuestion: {query}"
+            }
         ],
         temperature=0.2,
-        max_tokens=1024,
+        max_tokens=1024
     )
     return response.choices[0].message.content
 
-
 def ask_with_rag(query: str) -> str:
     chunks = retrieve_relevant_chunks(query)
-
+    
     if not chunks:
         return "Sorry, I couldn’t find relevant information from the documents."
 
-    # Safely extract content from each chunk
     context = "\n\n".join([chunk.get("content") or chunk.get("text", "") for chunk in chunks])
-
-    # Get the response from OpenAI
-    answer = get_openai_response(query, context)
-
-    return f"{answer.strip()}"
+    return get_openai_response(query, context).strip()
