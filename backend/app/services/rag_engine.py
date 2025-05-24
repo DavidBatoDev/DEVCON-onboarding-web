@@ -1,10 +1,7 @@
 from app.services.vector_store import load_from_store
 from app.services.embedder import get_embedder
 from app.core.config import settings
-from openai import OpenAI
-
-# Initialize OpenAI client
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
+import openai
 
 # Initialize embedder and vector store
 embedder = get_embedder()
@@ -15,7 +12,8 @@ def retrieve_relevant_chunks(query: str, top_k: int = 3):
     return vector_store.similarity_search(query_emb, top_k=top_k)
 
 def get_openai_response(query: str, context: str) -> str:
-    response = client.chat.completions.create(
+    openai.api_key = settings.OPENAI_API_KEY
+    response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
             {
@@ -30,7 +28,7 @@ def get_openai_response(query: str, context: str) -> str:
         temperature=0.2,
         max_tokens=1024
     )
-    return response.choices[0].message.content
+    return response.choices[0].message["content"]
 
 def ask_with_rag(query: str) -> str:
     chunks = retrieve_relevant_chunks(query)
@@ -39,4 +37,4 @@ def ask_with_rag(query: str) -> str:
         return "Sorry, I couldn’t find relevant information from the documents."
 
     context = "\n\n".join([chunk.get("content") or chunk.get("text", "") for chunk in chunks])
-    return get_openai_response(query, context).strip() 
+    return get_openai_response(query, context).strip()
