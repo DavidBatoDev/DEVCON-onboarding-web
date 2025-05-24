@@ -1,43 +1,47 @@
 from app.services.vector_store import load_from_store
 from app.services.embedder import get_embedder
 from app.core.config import settings
-import google.generativeai as genai
+from openai import OpenAI
 
-# Configure Gemini API globally
-genai.configure(api_key=settings.GEMINI_API_KEY)
+# Configure OpenAI API key
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
-# Initialize embedding and vector store
-ebd_model = get_embedder()
+# Initialize components
+embedder = get_embedder()
 vector_store = load_from_store()
-gemini = genai.GenerativeModel("gemini-pro")
+
 
 def retrieve_relevant_chunks(query: str, top_k: int = 3):
-    query_emb = ebd_model.encode(query).tolist()
-    results = vector_store.similarity_search(query_emb, top_k=top_k)
-    return results
+    query_emb = embedder.encode(query).tolist()
+    return vector_store.similarity_search(query_emb, top_k=top_k)
 
-def answer_question(query: str):
-    # Step 1: Retrieve relevant chunks
-    top_chunks = retrieve_relevant_chunks(query)
 
-    if not top_chunks:
-        return "Sorry, I couldn’t find relevant information."
+def get_openai_response(query: str, context: str) -> str:
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant answering questions based on internal DEVCON documents.",
+            },
+            {"role": "user", "content": f"{context}\n\nQuestion: {query}"},
+        ],
+        temperature=0.2,
+        max_tokens=1024,
+    )
+    return response.choices[0].message.content
 
-    # Step 2: Format context
-    context = "\n\n".join([chunk["text"] for chunk in top_chunks])
 
-    # Step 3: Generate answer with Gemini
-    prompt = f"""
-    You are a helpful assistant that answers questions based on internal DevCon documentation.
+def ask_with_rag(query: str) -> str:
+    chunks = retrieve_relevant_chunks(query)
 
-    Context:
-    {context}
+    if not chunks:
+        return "Sorry, I couldn’t find relevant information from the documents."
 
-    Question:
-    {query}
+    # Safely extract content from each chunk
+    context = "\n\n".join([chunk.get("content") or chunk.get("text", "") for chunk in chunks])
 
-    Answer:
-    """
+    # Get the response from OpenAI
+    answer = get_openai_response(query, context)
 
-    response = gemini.generate_content(prompt)
-    return response.text.strip()
+    return f"{answer.strip()}"
