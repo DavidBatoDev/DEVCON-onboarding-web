@@ -7,6 +7,10 @@ from app.api.v1.routes import router as v1_router
 
 app = FastAPI()
 
+@app.get("/healthz")
+def health_check():
+    return {"status": "ok"}
+
 # Enable CORS to allow frontend access
 app.add_middleware(
     CORSMiddleware,
