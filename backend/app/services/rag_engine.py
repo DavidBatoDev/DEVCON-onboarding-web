@@ -39,4 +39,4 @@ def ask_with_rag(query: str) -> str:
         return "Sorry, I couldn’t find relevant information from the documents."
 
     context = "\n\n".join([chunk.get("content") or chunk.get("text", "") for chunk in chunks])
-    return get_openai_response(query, context).strip()
+    return get_openai_response(query, context).strip() 
