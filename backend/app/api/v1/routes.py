@@ -4,14 +4,6 @@ from app.services.rag_engine import ask_with_rag
 
 router = APIRouter()
 
-@router.get("/")
-def health_check():
-    return {"status": "ready"}
-
-@router.get("/health")
-def health_check():
-    return {"status": "ok"}
-
 @router.post("/ask", response_model=AskResponse)
 async def ask_question(request: AskRequest):
     response = ask_with_rag(request.query)
