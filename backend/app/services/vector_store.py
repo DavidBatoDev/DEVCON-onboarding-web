@@ -22,6 +22,8 @@ class SimpleVectorStore:
             self.embeddings = []
 
     def similarity_search(self, query_embedding, top_k=3):
+        print(f"self.embeddings: {self.embeddings[:10]}")
+        print(f"Performing similarity search with query embedding: {query_embedding[:10]}")
         if not self.embeddings:
             return []
         sims = cosine_similarity([query_embedding], self.embeddings)[0]

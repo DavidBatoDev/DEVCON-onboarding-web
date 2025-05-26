@@ -32,6 +32,10 @@ def get_openai_response(query: str, context: str) -> str:
 def ask_with_rag(query: str) -> str:
     chunks = retrieve_relevant_chunks(query)
 
+    print(f"Retrieved {len(chunks)} relevant chunks for query: {query}")
+
+    print("Chunks:", chunks)
+
     if not chunks:
         return "Sorry, I couldn’t find relevant information from the documents."
 
