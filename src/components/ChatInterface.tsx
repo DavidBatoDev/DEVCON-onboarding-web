@@ -50,7 +50,7 @@ const ChatInterface: React.FC = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
-
+  console.log(import.meta.env.VITE_API_URL)
   const handleSendMessage = async (text: string) => {
     const userMessage: Message = {
       id: `user-${Date.now()}`,
@@ -61,7 +61,8 @@ const ChatInterface: React.FC = () => {
 
     setMessages(prev => [...prev, userMessage]);
     setIsTyping(true);
-
+    
+    
     try {
       const res = await fetch(import.meta.env.VITE_API_URL, { 
         method: 'POST',
