@@ -21,7 +21,7 @@ def get_openai_response(query: str, context: str) -> str:
             },
             {
                 "role": "user",
-                "content": f"{context}\n\nQuestion: {query}"
+                "content": f"THIS IS THE CONTEXT FROM RAG, (This in done behind the scene): {context}\n\Here's the user query: {query}"
             }
         ],
         temperature=0.2,
