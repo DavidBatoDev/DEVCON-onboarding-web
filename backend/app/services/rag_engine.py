@@ -1,14 +1,13 @@
 from app.services.vector_store import load_from_store
-from app.services.embedder import get_embedder
+from app.services.embedder import embed_texts
 from app.core.config import settings
 import openai
 
-# Initialize embedder and vector store
-embedder = get_embedder()
+# Initialize vector store
 vector_store = load_from_store()
 
 def retrieve_relevant_chunks(query: str, top_k: int = 3):
-    query_emb = embedder.encode(query).tolist()
+    query_emb = embed_texts([query])[0]
     return vector_store.similarity_search(query_emb, top_k=top_k)
 
 def get_openai_response(query: str, context: str) -> str:
@@ -32,9 +31,14 @@ def get_openai_response(query: str, context: str) -> str:
 
 def ask_with_rag(query: str) -> str:
     chunks = retrieve_relevant_chunks(query)
-    
+
     if not chunks:
         return "Sorry, I couldn’t find relevant information from the documents."
 
-    context = "\n\n".join([chunk.get("content") or chunk.get("text", "") for chunk in chunks])
+    # Use only 'text' or 'content' fields, avoid overloading OpenAI token limits
+    context = "\n\n".join([chunk.get("text") or chunk.get("content", "") for chunk in chunks])
+    
+    # Truncate to ~48,000 characters (~12k tokens) to avoid 16k token ceiling
+    context = context[:48000]
+    
     return get_openai_response(query, context).strip()

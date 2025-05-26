@@ -50,7 +50,7 @@ const ChatInterface: React.FC = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
-
+  console.log(import.meta.env.VITE_API_URL)
   const handleSendMessage = async (text: string) => {
     const userMessage: Message = {
       id: `user-${Date.now()}`,
@@ -61,9 +61,10 @@ const ChatInterface: React.FC = () => {
 
     setMessages(prev => [...prev, userMessage]);
     setIsTyping(true);
-
+    
+    
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/ask', {
+      const res = await fetch(import.meta.env.VITE_API_URL, { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: text })
@@ -90,6 +91,7 @@ const ChatInterface: React.FC = () => {
       setIsTyping(false);
     }
   };
+
 
   const clearChat = () => {
     setMessages([welcomeMessage]);
