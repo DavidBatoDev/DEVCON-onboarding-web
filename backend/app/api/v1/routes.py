@@ -4,6 +4,10 @@ from app.services.rag_engine import ask_with_rag
 
 router = APIRouter()
 
+@router.get("/")
+def health_check():
+    return {"status": "ready"}
+
 @router.get("/health")
 def health_check():
     return {"status": "ok"}
