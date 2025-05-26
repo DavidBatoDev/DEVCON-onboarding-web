@@ -21,7 +21,11 @@ def get_openai_response(query: str, context: str) -> str:
             },
             {
                 "role": "user",
-                "content": f"THIS IS THE CONTEXT FROM RAG, (This in done behind the scene): {context}\n\Here's the user query: {query}"
+                "content": (
+                    f"Below is some context retrieved from documents. If it's helpful to answer the question or query, feel free to use it. Otherwise, ignore it.\n\n"
+                    f"📚 Context:\n{context}\n\n"
+                    f"🧠 Query:\n{query}"
+                )
             }
         ],
         temperature=0.2,
