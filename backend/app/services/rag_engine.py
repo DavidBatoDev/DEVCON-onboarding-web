@@ -22,7 +22,7 @@ def get_openai_response(query: str, context: str) -> str:
             {
                 "role": "user",
                 "content": (
-                    f"Below is some context retrieved from documents. If it's helpful to answer the question or query, feel free to use it. Otherwise, ignore it.\n\n"
+                    f"Below is some context retrieved from documents. If it's helpful to answer the question or query, feel free to use it. Otherwise, ignore it. Add Emojis in chats to make it betters \n\n"
                     f"📚 Context:\n{context}\n\n"
                     f"🧠 Query:\n{query}"
                 )
@@ -43,10 +43,8 @@ def ask_with_rag(query: str) -> str:
     if not chunks:
         return "Sorry, I couldn’t find relevant information from the documents."
 
-    # Use only 'text' or 'content' fields, avoid overloading OpenAI token limits
     context = "\n\n".join([chunk.get("text") or chunk.get("content", "") for chunk in chunks])
     
-    # Truncate to ~48,000 characters (~12k tokens) to avoid 16k token ceiling
     context = context[:48000]
     
     return get_openai_response(query, context).strip()
