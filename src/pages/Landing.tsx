@@ -82,22 +82,22 @@ const Landing: React.FC = () => {
       image: "/DEVCON_intership.png"
     },
     {
-      title: "She is DEVCON",
-      description: "Supporting and empowering women in the tech industry through workshops, networking events, and mentorship.",
-      image: "/She_is_DEVCON.jpg"
+      title: "DEVCON Climate Summit",
+      description: "The flagship gathering of the Philippines' largest tech community, uniting innovators through talks, expos, and hands-on learning.",
+      image: "/summit.jpg"
     },
     {
       title: "Code Camp",
       description: "Intensive coding bootcamps that prepare participants for the demands of the tech industry.",
-      image: "/DEVCON_codecamp.png"
+      image: "/ICP_Codecamp.jpg"
     }
   ];
 
   // Chapters data
   const chapterLocations = [
-    { region: "Luzon", cities: ["Manila", "Quezon City", "Baguio", "Batangas", "Cavite", "Laguna"] },
-    { region: "Visayas", cities: ["Cebu", "Iloilo", "Bacolod", "Tacloban", "Dumaguete"] },
-    { region: "Mindanao", cities: ["Davao", "Cagayan de Oro", "General Santos", "Zamboanga", "Butuan"] }
+    { region: "Luzon", cities: ["Manila", "Laguna", "Pampanga", "Legazpi",] },
+    { region: "Visayas", cities: ["Cebu", "Iloilo", "Bacolod", ] },
+    { region: "Mindanao", cities: ["Davao", "Cagayan de Oro", "Bukidnon", "Iligan"] }
   ];
 
   return (
@@ -148,11 +148,14 @@ const Landing: React.FC = () => {
             <div className="inline-block px-4 py-1 bg-devcon-purple/40 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium mb-2">
               Est. 2009 • 15 Years of Excellence
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-              WELCOME TO DEVCON'S
-              <span className="bg-gradient-to-r from-devcon-yellow to-devcon-orange bg-clip-text text-transparent"> OFFICERS' ONBOARDING BOT</span>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-left">
+              <span className="block text-white">WELCOME TO</span>
+              <span className="block text-white">DEVCON'S OFFICERS'</span>
+              <span className="block text-4xl md:text-5xl lg:text-6xl bg-gradient-to-r from-devcon-yellow to-devcon-orange bg-clip-text text-transparent">
+                ONBOARDING BOT
+              </span>
             </h1>
-            <p className="text-white/80 text-lg md:text-xl">
+            <p className="text-white/80 text-lg md:text-xl text-justify">
               Start strong with the DEVCON Chapter Officers’ Onboarding Bot — your go-to guide for leading a successful chapter. Kickstart your journey in tech with DEVCON. 
             </p>
             <div className="pt-4">
@@ -244,27 +247,27 @@ const Landing: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-white">About Us</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div className="space-y-6">
-            <div className="text-white/80 space-y-4">
-              <p className="text-lg">
-                Developers Connect (DEVCON) is the premier organization of professional developers in the Philippines. It was founded in 2009 to create a sustainable community of developers and innovators across the country.
-              </p>
-              <p>
-                For 15 years, we've been building connections between students, professionals, and tech companies, fostering knowledge exchange and professional growth through various initiatives.
-              </p>
-              <p>
-                Our mission is to empower Filipino developers through education, community building, and industry connections. We believe in creating equal opportunities for everyone in tech, regardless of background.
-              </p>
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="space-y-6">
+          <div className="text-white/80 space-y-4 text-lg text-justify"> {/* ✅ Added text-justify */}
+            <p>
+              DevConnect (DEVCON) is the premier organization of professional developers in the Philippines. It was founded in 2009 to create a sustainable community of developers and innovators across the country.
+            </p>
+            <p>
+              For 15 years, we've been building connections between students, professionals, and tech companies, fostering knowledge exchange and professional growth through various initiatives.
+            </p>
+            <p>
+              Our mission: to create vibrant communities of software developers empowered with knowledge, open-source software, and opportunities to solve impactful initiatives for the country.
+            </p>
+          </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
                 <h4 className="text-xl font-bold text-devcon-yellow">Our Vision</h4>
-                <p className="text-white/80 mt-2">A thriving, world-class Filipino developer community.</p>
+                <p className="text-white/80 mt-2">A technology-empowered Philippines for all.</p>
               </div>
               <div className="p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
                 <h4 className="text-xl font-bold text-devcon-yellow">Our Mission</h4>
-                <p className="text-white/80 mt-2">To connect and empower developers across the Philippines.</p>
+                <p className="text-white/80 mt-2">To create vibrant communities of software developers</p>
               </div>
             </div>
           </div>
@@ -515,7 +518,7 @@ const Landing: React.FC = () => {
             <div className="mb-6 md:mb-0">
               <DevconLogo className="scale-100" />
               <p className="text-white/60 mt-4 max-w-md">
-                Developers' Conference Philippines (DEVCON) is the premier community of developers and innovators in the Philippines.
+                DevConnect Philippines (DEVCON) is the premier community of developers and innovators in the Philippines.
               </p>
             </div>
             <div className="flex flex-col items-center md:items-end">

@@ -42,7 +42,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest }) => {
       >
         <div className="mb-1 flex items-center justify-between">
           <div className="font-medium">
-            {isUser ? "You" : "DEVCON AI"}
+            {isUser ? "You" : "DEBBIE"}
           </div>
           <div className="text-xs opacity-70 ml-4">{formattedTime}</div>
         </div>

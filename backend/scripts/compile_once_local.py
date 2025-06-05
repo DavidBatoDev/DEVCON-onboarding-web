@@ -4,6 +4,7 @@ from app.services.embedder import embed_texts
 from app.services.vector_store import save_to_store
 from app.core.config import settings
 
+# Replace with your actual Google Drive folder ID
 FOLDER_ID = "1eocL8T8BH6EwnP5siOtDz3FG2CqGHveS"
 
 print("Starting full document compilation...")
