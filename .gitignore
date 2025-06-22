@@ -33,6 +33,4 @@ backend/keys/
 *.sln
 *.sw?
 .env
-.env
-.env
-.env
+__pycache__/
