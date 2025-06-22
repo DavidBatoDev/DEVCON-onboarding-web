@@ -124,7 +124,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest, isNewMessa
         )}>
           {/* Avatar - only for bot */}
           {!isUser && (
-            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium bg-devcon-background text-white">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium bg-secondary text-white">
               D
             </div>
           )}

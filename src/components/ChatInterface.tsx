@@ -31,7 +31,6 @@ const ChatInterface: React.FC = () => {
       "**Ready to roll? Let's do this! 🚀😄**",
       "",
       "---",
-      "_📝 Limitations and Data Source: Not real-time. Data as of May 26, 2025"
     ].join("\n"),
     timestamp: new Date()
   };
