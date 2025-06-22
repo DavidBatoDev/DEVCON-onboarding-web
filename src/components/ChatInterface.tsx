@@ -6,30 +6,32 @@ import TypingIndicator from './TypingIndicator';
 import DevconLogo from './DevconLogo';
 import { ArrowLeft, Trash2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { sendMessageToBot } from '@/services/chatService';
 
 const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [latestMessageId, setLatestMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const welcomeMessage: Message = {
     id: 'welcome',
     role: 'assistant',
     content: [
- "**🎉 Hey there, Officer! 🎉**",
-    "Welcome aboard the **DEBBIE — DEVCON Officer Onboarding Bot** — your cheerful sidekick on this exciting tech adventure! 💻✨",
-    "",
-    "I’m here to help you kickstart your journey with:",
-    "- 📋 **Checklists** to keep you on track",
-    "- 📚 **Guides and best practices**",
-    "- 🛠️ **Tools** to lead your chapter smoothly",
-    "- 🎯 **Tips** to turn ideas into action**",
-    "",
-    "So buckle up, future tech leader — your chapter is waiting, and I’ve got your back every step of the way.",
-    "**Ready to roll? Let’s do this! 🚀😄**",
-    "",
-    "---",
-    "_📝 Limitations and Data Source: Not real-time. Data as of May 26, 2025"
+      "**🎉 Hey there, Officer! 🎉**",
+      "Welcome aboard the **DEBBIE — DEVCON Officer Onboarding Bot** — your cheerful sidekick on this exciting tech adventure! 💻✨",
+      "",
+      "I'm here to help you kickstart your journey with:",
+      "- 📋 **Checklists** to keep you on track",
+      "- 📚 **Guides and best practices**",
+      "- 🛠️ **Tools** to lead your chapter smoothly",
+      "- 🎯 **Tips** to turn ideas into action**",
+      "",
+      "So buckle up, future tech leader — your chapter is waiting, and I've got your back every step of the way.",
+      "**Ready to roll? Let's do this! 🚀😄**",
+      "",
+      "---",
+      "_📝 Limitations and Data Source: Not real-time. Data as of May 26, 2025"
     ].join("\n"),
     timestamp: new Date()
   };
@@ -53,7 +55,21 @@ const ChatInterface: React.FC = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
-  console.log(import.meta.env.VITE_API_URL)
+
+  // Helper function to get conversation history for context
+  const getConversationHistory = (): Array<{role: string, content: string}> => {
+    // Get last 10 messages (excluding welcome message) for context
+    const recentMessages = messages
+      .filter(msg => msg.id !== 'welcome')
+      .slice(-10)
+      .map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+    
+    return recentMessages;
+  };
+
   const handleSendMessage = async (text: string) => {
     const userMessage: Message = {
       id: `user-${Date.now()}`,
@@ -65,23 +81,23 @@ const ChatInterface: React.FC = () => {
     setMessages(prev => [...prev, userMessage]);
     setIsTyping(true);
     
-    
     try {
-      const res = await fetch(import.meta.env.VITE_API_URL, { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: text })
-      });
+      // Get conversation history for context
+      const history = getConversationHistory();
+      
+      // Send message with history context
+      const data = await sendMessageToBot(text, history);
 
-      const data = await res.json();
-
+      const botMessageId = `bot-${Date.now()}`;
       const botMessage: Message = {
-        id: `bot-${Date.now()}`,
+        id: botMessageId,
         role: 'assistant',
         content: data.answer || '⚠️ No answer provided.',
         timestamp: new Date()
       };
 
+      // Set this as the latest message to trigger typewriter
+      setLatestMessageId(botMessageId);
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error(error);
@@ -95,9 +111,9 @@ const ChatInterface: React.FC = () => {
     }
   };
 
-
   const clearChat = () => {
     setMessages([welcomeMessage]);
+    setLatestMessageId(null);
     localStorage.removeItem('devcon-chat-history');
     toast({
       title: 'Chat cleared.',
@@ -123,18 +139,23 @@ const ChatInterface: React.FC = () => {
           <span>Clear Chat</span>
         </button>
       </header>
-
+      
       <div className="flex-1 overflow-y-auto p-4">
         <div className="max-w-3xl mx-auto space-y-6">
           {messages.map((msg, idx) => (
-            <ChatMessage key={msg.id} message={msg} isLatest={idx === messages.length - 1} />
+            <ChatMessage 
+              key={msg.id} 
+              message={msg} 
+              isLatest={idx === messages.length - 1}
+              isNewMessage={msg.id === latestMessageId}
+            />
           ))}
           {isTyping && <TypingIndicator />}
           <div ref={messagesEndRef} />
         </div>
       </div>
 
-      <div className="border-t border-border backdrop-blur-md bg-black/30 py-4">
+      <div className="bg-transparent py-4">
         <div className="w-full max-w-3xl mx-auto px-4">
           <ChatInput onSendMessage={handleSendMessage} isLoading={isTyping} />
         </div>
