@@ -15,12 +15,17 @@ def health_check():
 def health_check():
     return {"status": "ok"}
 
+origins = [
+    "http://localhost:8082",  # your frontend
+]
+
+
 # Enable CORS to allow frontend access
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # You can restrict to your frontend URL in prod
+    allow_origins=["*"],  
     allow_credentials=True,
-    allow_methods=["*"],  # Include OPTIONS, GET, POST, etc.
+    allow_methods=["*"],  
     allow_headers=["*"],
 )
 
@@ -28,4 +33,4 @@ app.include_router(v1_router, prefix="/api/v1")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, port=8000, debug=True, host="127.0.0.1")
+    uvicorn.run(app, port=8000, host="127.0.0.1")
