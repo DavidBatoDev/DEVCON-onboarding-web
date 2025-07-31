@@ -1,6 +1,13 @@
 // client/src/services/chatService.ts
-const BACKEND_URL =
-  import.meta.env.VITE_BACKEND_URL || "http://localhost:8001";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+
+// Ensure the URL doesn't end with a slash to avoid double slashes
+const getApiUrl = (endpoint: string) => {
+  const baseUrl = BACKEND_URL.endsWith("/")
+    ? BACKEND_URL.slice(0, -1)
+    : BACKEND_URL;
+  return `${baseUrl}${endpoint}`;
+};
 
 interface ChatHistory {
   role: string;
@@ -8,18 +15,18 @@ interface ChatHistory {
 }
 
 export const sendMessageToBot = async (
-  message: string, 
+  message: string,
   history: ChatHistory[] = []
 ): Promise<{ answer: string }> => {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/v1/ask`, {
-      method: 'POST',
+    const response = await fetch(getApiUrl("/api/v1/ask"), {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         query: message,
-        history: history // Include conversation history
+        history: history, // Include conversation history
       }),
     });
 
@@ -30,7 +37,7 @@ export const sendMessageToBot = async (
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error sending message to bot:', error);
+    console.error("Error sending message to bot:", error);
     throw error;
   }
 };
