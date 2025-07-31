@@ -11,6 +11,8 @@ import {
   Play,
   Clock,
   ArrowLeft,
+  ExternalLink,
+  Link,
 } from "lucide-react";
 
 const DriveFilesFetcher = () => {
@@ -248,6 +250,18 @@ const DriveFilesFetcher = () => {
     document.body.removeChild(link);
   };
 
+  const getGoogleDocsUrl = (fileId) => {
+    return `https://docs.google.com/document/d/${fileId}/edit`;
+  };
+
+  const getGoogleDriveUrl = (fileId) => {
+    return `https://drive.google.com/file/d/${fileId}/view`;
+  };
+
+  const openInNewTab = (url) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   const LoadingScreen = () => (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 flex items-center justify-center">
       <div className="text-center space-y-8">
@@ -299,30 +313,50 @@ const DriveFilesFetcher = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/10 to-gray-900">
       {/* Header */}
-      <div className="bg-white/5 backdrop-blur-sm border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="bg-gradient-to-r from-gray-900/95 via-purple-900/20 to-gray-900/95 backdrop-blur-md border-b border-white/10 shadow-lg">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          {/* Single Header Row */}
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white">
-                DEVCON Drive Files
-              </h1>
-              <p className="text-white/70 mt-2">
-                Manage and process your Google Drive documents
-              </p>
-            </div>
-            <div className="flex space-x-3">
+            <div className="flex items-center space-x-6">
               <button
                 onClick={() => window.history.back()}
-                className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105"
+                className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 backdrop-blur-sm border border-white/20"
               >
                 <ArrowLeft className="size-4" />
                 <span>Back</span>
               </button>
 
+              <div className="flex items-center space-x-4">
+                <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-2 rounded-lg shadow-lg">
+                  <Folder className="text-gray-900" size={24} />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-white tracking-tight">
+                    DEVCON Drive Files
+                  </h1>
+                  <a
+                    href="https://drive.google.com/drive/folders/1eocL8T8BH6EwnP5siOtDz3FG2CqGHveS"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-colors text-sm font-medium"
+                  >
+                    <ExternalLink size={14} />
+                    <span>Open with Google Drive</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 text-white/60">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-sm">Connected</span>
+              </div>
+
               <button
                 onClick={() => fetchDriveFiles()}
                 disabled={loading || isRebuilding}
-                className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 disabled:opacity-50"
+                className="flex items-center space-x-2 bg-blue-600/80 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 disabled:opacity-50 backdrop-blur-sm"
               >
                 <RefreshCw
                   className={`size-4 ${loading ? "animate-spin" : ""}`}
@@ -337,7 +371,7 @@ const DriveFilesFetcher = () => {
                   )
                 }
                 disabled={loading || isRebuilding || files.length === 0}
-                className="flex items-center space-x-2 bg-yellow-500 hover:bg-orange-500 text-gray-900 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 disabled:opacity-50"
+                className="flex items-center space-x-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-gray-900 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 disabled:opacity-50 shadow-lg"
               >
                 <Play
                   className={`size-4 ${isRebuilding ? "animate-spin" : ""}`}
@@ -500,24 +534,24 @@ const DriveFilesFetcher = () => {
                   key={file.id || index}
                   className="p-4 hover:bg-white/5 transition-colors"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4 flex-1">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center space-x-4 flex-1 min-w-0">
                       <input
                         type="checkbox"
                         checked={selectedFiles.has(file.id)}
                         onChange={() => toggleFileSelection(file.id)}
-                        className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+                        className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 flex-shrink-0"
                       />
                       <div className="flex-shrink-0">
                         {getFileIcon(file.mime_type)}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-2">
-                          <h4 className="text-white font-medium truncate">
+                      <div className="flex-1 min-w-0 overflow-hidden">
+                        <div className="flex items-center space-x-2 min-w-0">
+                          <h4 className="text-white font-medium truncate flex-1 min-w-0">
                             {file.name}
                           </h4>
                           {file.status && (
-                            <div className="flex items-center space-x-1">
+                            <div className="flex items-center space-x-1 flex-shrink-0">
                               {getStatusIcon(file.status)}
                               <span
                                 className={`text-xs font-medium ${getStatusColor(
@@ -529,13 +563,15 @@ const DriveFilesFetcher = () => {
                             </div>
                           )}
                         </div>
-                        <div className="flex items-center space-x-4 mt-1 text-sm text-white/70">
-                          <span>{formatFileSize(file.size)}</span>
-                          <span>
+                        <div className="flex items-center space-x-4 mt-1 text-sm text-white/70 overflow-hidden">
+                          <span className="truncate">
+                            {formatFileSize(file.size)}
+                          </span>
+                          <span className="truncate">
                             Modified: {formatDate(file.modified_time)}
                           </span>
                           {file.mime_type && (
-                            <span className="text-xs bg-white/10 px-2 py-1 rounded">
+                            <span className="text-xs bg-white/10 px-2 py-1 rounded flex-shrink-0">
                               {file.mime_type.split("/")[1]?.toUpperCase() ||
                                 "FILE"}
                             </span>
@@ -543,13 +579,20 @@ const DriveFilesFetcher = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 flex-shrink-0">
                       <button
-                        onClick={() => downloadFile(file.id, file.name)}
+                        onClick={() => openInNewTab(getGoogleDocsUrl(file.id))}
                         className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                        title="Download file"
+                        title="Open in Google Docs"
                       >
-                        <Download size={16} />
+                        <Link size={16} />
+                      </button>
+                      <button
+                        onClick={() => openInNewTab(getGoogleDriveUrl(file.id))}
+                        className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                        title="Open in Google Drive"
+                      >
+                        <ExternalLink size={16} />
                       </button>
                     </div>
                   </div>
