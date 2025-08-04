@@ -14,6 +14,33 @@ interface ChatHistory {
   content: string;
 }
 
+interface ServerStatus {
+  server_up: boolean;
+  server_running: boolean;
+  message: string;
+}
+
+export const checkServerStatus = async (): Promise<ServerStatus> => {
+  try {
+    const response = await fetch(getApiUrl("/api/v1/status"), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error checking server status:", error);
+    throw error;
+  }
+};
+
 export const sendMessageToBot = async (
   message: string,
   history: ChatHistory[] = []
