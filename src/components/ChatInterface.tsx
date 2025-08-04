@@ -94,6 +94,8 @@ const ChatInterface: React.FC = () => {
         content: msg.content,
       }));
 
+    console.log(recentMessages);
+
     return recentMessages;
   };
 
