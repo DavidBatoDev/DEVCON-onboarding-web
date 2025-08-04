@@ -4,7 +4,6 @@ import ChatMessage, { Message } from "./ChatMessage";
 import ChatInput from "./ChatInput";
 import TypingIndicator from "./TypingIndicator";
 import DevconLogo from "./DevconLogo";
-import LoadingModal from "./LoadingModal";
 import { ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { sendMessageToBot, checkServerStatus } from "@/services/chatService";
@@ -13,7 +12,7 @@ const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [latestMessageId, setLatestMessageId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isServerUp, setIsServerUp] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const welcomeMessage: Message = {
@@ -37,28 +36,31 @@ const ChatInterface: React.FC = () => {
     timestamp: new Date(),
   };
 
-  // Check server status on component mount
+  // Check server status on first render only
   useEffect(() => {
-    const initializeChat = async () => {
+    const checkServerStatusInBackground = async () => {
       try {
-        await checkServerStatus();
-        // Server is up, close the loading modal
-        setIsLoading(false);
+        console.log("Checking server status", isServerUp);
+        // await checkServerStatus();
+        // set time out to 5 seconds
+        setTimeout(() => {
+          console.log("Setting server to UP");
+          setIsServerUp(true);
+        }, 5000);
       } catch (error) {
-        console.error("Failed to connect to server:", error);
-        toast({
-          title: "Connection Error",
-          description:
-            "Unable to connect to the server. Please try again later.",
-          variant: "destructive",
-        });
-        // Still close the modal even if there's an error
-        setIsLoading(false);
+        console.error("Server is not available:", error);
+        setIsServerUp(false);
       }
     };
 
-    initializeChat();
-  }, []);
+    // Initial check only
+    checkServerStatusInBackground();
+  }, []); // Empty dependency array - only runs on first render
+
+  // Monitor isServerUp changes
+  useEffect(() => {
+    console.log("isServerUp changed to:", isServerUp);
+  }, [isServerUp]);
 
   // Load saved messages on mount
   useEffect(() => {
@@ -99,22 +101,11 @@ const ChatInterface: React.FC = () => {
     return recentMessages;
   };
 
-  const handleSendMessage = async (text: string) => {
-    const userMessage: Message = {
-      id: `user-${Date.now()}`,
-      role: "user",
-      content: text,
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setIsTyping(true);
-
+  const processMessage = async (
+    text: string,
+    history: Array<{ role: string; content: string }>
+  ) => {
     try {
-      // Get conversation history for context
-      const history = getConversationHistory();
-
-      // Send message with history context
       const data = await sendMessageToBot(text, history);
 
       const botMessageId = `bot-${Date.now()}`;
@@ -125,7 +116,6 @@ const ChatInterface: React.FC = () => {
         timestamp: new Date(),
       };
 
-      // Set this as the latest message to trigger typewriter
       setLatestMessageId(botMessageId);
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
@@ -140,6 +130,50 @@ const ChatInterface: React.FC = () => {
     }
   };
 
+  const handleSendMessage = async (text: string) => {
+    const userMessage: Message = {
+      id: `user-${Date.now()}`,
+      role: "user",
+      content: text,
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setIsTyping(true);
+
+    // Get conversation history for context
+    const history = getConversationHistory();
+
+    console.log("isServerUp when send message", isServerUp);
+
+    if (!isServerUp) {
+      // Show offline message immediately
+      const offlineMessageId = `bot-${Date.now()}`;
+      const offlineMessage: Message = {
+        id: offlineMessageId,
+        role: "assistant",
+        content:
+          "Hi! I'm still on beta and using available free credits while we testing the waters. I'm currently pulling the answer from the @[https://linktr.ee/fordevconchapterleads](https://linktr.ee/fordevconchapterleads) and HQ documents. Expect few minutes for a response!",
+        timestamp: new Date(),
+      };
+
+      setLatestMessageId(offlineMessageId);
+      setMessages((prev) => [...prev, offlineMessage]);
+
+      // Send API request after 2 seconds
+      setTimeout(async () => {
+        try {
+          await processMessage(text, history);
+        } catch (error) {
+          console.error("Failed to process message after delay:", error);
+        }
+      }, 2000);
+    } else {
+      // Server is up, process immediately
+      await processMessage(text, history);
+    }
+  };
+
   const clearChat = () => {
     setMessages([welcomeMessage]);
     setLatestMessageId(null);
@@ -151,51 +185,48 @@ const ChatInterface: React.FC = () => {
   };
 
   return (
-    <>
-      <LoadingModal isOpen={isLoading} />
-      <div className="flex flex-col h-screen bg-gradient-to-b from-devcon-background to-devcon-background/90">
-        <header className="flex items-center justify-between px-4 py-3 border-b border-border backdrop-blur-md bg-black/30 shadow-md">
-          <div className="flex items-center gap-4">
-            <Link
-              to="/devcon"
-              className="flex items-center text-muted-foreground hover:text-white transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              <span className="text-sm">Back to Home</span>
-            </Link>
-            <DevconLogo />
-          </div>
-          <button
-            onClick={clearChat}
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-white transition-colors bg-black/20 px-3 py-1 rounded-full"
+    <div className="flex flex-col h-screen bg-gradient-to-b from-devcon-background to-devcon-background/90">
+      <header className="flex items-center justify-between px-4 py-3 border-b border-border backdrop-blur-md bg-black/30 shadow-md">
+        <div className="flex items-center gap-4">
+          <Link
+            to="/devcon"
+            className="flex items-center text-muted-foreground hover:text-white transition-colors"
           >
-            <Trash2 className="h-3.5 w-3.5" />
-            <span>Clear Chat</span>
-          </button>
-        </header>
-
-        <div className="flex-1 overflow-y-auto p-4">
-          <div className="max-w-3xl mx-auto space-y-6">
-            {messages.map((msg, idx) => (
-              <ChatMessage
-                key={msg.id}
-                message={msg}
-                isLatest={idx === messages.length - 1}
-                isNewMessage={msg.id === latestMessageId}
-              />
-            ))}
-            {isTyping && <TypingIndicator />}
-            <div ref={messagesEndRef} />
-          </div>
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            <span className="text-sm">Back to Home</span>
+          </Link>
+          <DevconLogo />
         </div>
+        <button
+          onClick={clearChat}
+          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-white transition-colors bg-black/20 px-3 py-1 rounded-full"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+          <span>Clear Chat</span>
+        </button>
+      </header>
 
-        <div className="bg-transparent py-4">
-          <div className="w-full max-w-3xl mx-auto px-4">
-            <ChatInput onSendMessage={handleSendMessage} isLoading={isTyping} />
-          </div>
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="max-w-3xl mx-auto space-y-6">
+          {messages.map((msg, idx) => (
+            <ChatMessage
+              key={msg.id}
+              message={msg}
+              isLatest={idx === messages.length - 1}
+              isNewMessage={msg.id === latestMessageId}
+            />
+          ))}
+          {isTyping && <TypingIndicator />}
+          <div ref={messagesEndRef} />
         </div>
       </div>
-    </>
+
+      <div className="bg-transparent py-4">
+        <div className="w-full max-w-3xl mx-auto px-4">
+          <ChatInput onSendMessage={handleSendMessage} isLoading={isTyping} />
+        </div>
+      </div>
+    </div>
   );
 };
 
