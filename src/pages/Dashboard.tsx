@@ -509,6 +509,14 @@ const Dashboard = () => {
                 <span>Back</span>
               </button>
 
+              <button
+                onClick={() => (window.location.href = "/")}
+                className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-300 hover:to-orange-300 text-gray-900 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 shadow-lg"
+              >
+                <BarChart3 className="size-4" />
+                <span>Test Chat</span>
+              </button>
+
               <div className="flex items-center space-x-4">
                 <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-2 rounded-lg shadow-lg">
                   <BarChart3 className="text-gray-900" size={24} />
