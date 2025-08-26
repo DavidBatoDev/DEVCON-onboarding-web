@@ -41,8 +41,10 @@ const ChatInterface: React.FC = () => {
     const checkServerStatusInBackground = async () => {
       try {
         console.log("Checking server status", isServerUp);
-        await checkServerStatus();
+        // await checkServerStatus();
+        await new Promise((resolve) => setTimeout(resolve, 30000));
         setIsServerUp(true);
+        // setIsServerUp(true);
       } catch (error) {
         console.error("Server is not available:", error);
         setIsServerUp(false);
