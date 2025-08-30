@@ -497,57 +497,51 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/10 to-gray-900">
       {/* Header */}
       <div className="bg-gradient-to-r from-gray-900/95 via-purple-900/20 to-gray-900/95 backdrop-blur-md border-b border-white/10 shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          {/* Single Header Row */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-6">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          {/* Mobile Layout */}
+          <div className="lg:hidden space-y-4">
+            {/* Top Row - Logo and Back Button */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-2 rounded-lg shadow-lg">
+                  <BarChart3 className="text-gray-900" size={20} />
+                </div>
+                <div>
+                  <h1 className="text-lg font-bold text-white tracking-tight">
+                    DEVCON
+                  </h1>
+                  <p className="text-white/70 text-xs">Dashboard</p>
+                </div>
+              </div>
+
               <button
                 onClick={() => window.history.back()}
-                className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 backdrop-blur-sm border border-white/20"
+                className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg font-medium transition-all duration-200 backdrop-blur-sm border border-white/20 text-sm"
               >
                 <ArrowLeft className="size-4" />
                 <span>Back</span>
               </button>
+            </div>
 
+            {/* Action Buttons - Stacked */}
+            <div className="grid grid-cols-1 gap-2">
               <button
                 onClick={() => (window.location.href = "/")}
-                className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-300 hover:to-orange-300 text-gray-900 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 shadow-lg"
+                className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-300 hover:to-orange-300 text-gray-900 px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg text-sm"
               >
                 <BarChart3 className="size-4" />
                 <span>Test Chat</span>
               </button>
 
-              <div className="flex items-center space-x-4">
-                <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-2 rounded-lg shadow-lg">
-                  <BarChart3 className="text-gray-900" size={24} />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-white tracking-tight">
-                    DEVCON Dashboard
-                  </h1>
-                  <p className="text-white/70 text-sm">
-                    Monitor and manage your document processing system
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-white/60">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-sm">System Online</span>
-              </div>
-
               <button
                 onClick={() => fetchDriveFiles()}
                 disabled={loading || isRebuilding}
-                className="flex items-center space-x-2 bg-blue-600/80 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 disabled:opacity-50 backdrop-blur-sm"
-                title="Refresh All Data"
+                className="w-full flex items-center justify-center space-x-2 bg-blue-600/80 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 backdrop-blur-sm text-sm"
               >
                 <RefreshCw
                   className={`size-4 ${loading ? "animate-spin" : ""}`}
                 />
-                <span>Refresh All</span>
+                <span>Refresh All Data</span>
               </button>
 
               <button
@@ -557,8 +551,7 @@ const Dashboard = () => {
                   )
                 }
                 disabled={loading || isRebuilding || files.length === 0}
-                className="flex items-center space-x-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-gray-900 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 disabled:opacity-50 shadow-lg"
-                title="Only use if you need to re-index documents"
+                className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-gray-900 px-4 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 shadow-lg text-sm"
               >
                 <Play
                   className={`size-4 ${isRebuilding ? "animate-spin" : ""}`}
@@ -571,6 +564,90 @@ const Dashboard = () => {
                     : "Re-index All"}
                 </span>
               </button>
+            </div>
+
+            {/* System Status */}
+            <div className="flex items-center justify-center space-x-2 text-white/60 bg-white/5 rounded-lg px-3 py-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-xs">System Online</span>
+            </div>
+          </div>
+
+          {/* Desktop Layout */}
+          <div className="hidden lg:block">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-6">
+                <button
+                  onClick={() => window.history.back()}
+                  className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 backdrop-blur-sm border border-white/20"
+                >
+                  <ArrowLeft className="size-4" />
+                  <span>Back</span>
+                </button>
+
+                <button
+                  onClick={() => (window.location.href = "/")}
+                  className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-300 hover:to-orange-300 text-gray-900 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 shadow-lg"
+                >
+                  <BarChart3 className="size-4" />
+                  <span>Test Chat</span>
+                </button>
+
+                <div className="flex items-center space-x-4">
+                  <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-2 rounded-lg shadow-lg">
+                    <BarChart3 className="text-gray-900" size={24} />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-bold text-white tracking-tight">
+                      DEVCON Dashboard
+                    </h1>
+                    <p className="text-white/70 text-sm">
+                      Monitor and manage your document processing system
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 text-white/60">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm">System Online</span>
+                </div>
+
+                <button
+                  onClick={() => fetchDriveFiles()}
+                  disabled={loading || isRebuilding}
+                  className="flex items-center space-x-2 bg-blue-600/80 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 disabled:opacity-50 backdrop-blur-sm"
+                  title="Refresh All Data"
+                >
+                  <RefreshCw
+                    className={`size-4 ${loading ? "animate-spin" : ""}`}
+                  />
+                  <span>Refresh All</span>
+                </button>
+
+                <button
+                  onClick={() =>
+                    handleRebuildIndex(
+                      selectedFiles.size > 0 ? Array.from(selectedFiles) : null
+                    )
+                  }
+                  disabled={loading || isRebuilding || files.length === 0}
+                  className="flex items-center space-x-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-gray-900 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 disabled:opacity-50 shadow-lg"
+                  title="Only use if you need to re-index documents"
+                >
+                  <Play
+                    className={`size-4 ${isRebuilding ? "animate-spin" : ""}`}
+                  />
+                  <span>
+                    {isRebuilding
+                      ? "Processing..."
+                      : selectedFiles.size > 0
+                      ? `Re-index Selected (${selectedFiles.size})`
+                      : "Re-index All"}
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
