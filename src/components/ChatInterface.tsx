@@ -23,29 +23,21 @@ const ChatInterface: React.FC = () => {
   const [isServerUp, setIsServerUp] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Check server status on first render only
+  // Check real server status on mount (drives the header status dot)
   useEffect(() => {
-    const checkServerStatusInBackground = async () => {
-      try {
-        console.log("Checking server status", isServerUp);
-        // await checkServerStatus();
-        await new Promise((resolve) => setTimeout(resolve, 30000));
-        setIsServerUp(true);
-        // setIsServerUp(true);
-      } catch (error) {
+    let cancelled = false;
+    checkServerStatus()
+      .then(() => {
+        if (!cancelled) setIsServerUp(true);
+      })
+      .catch((error) => {
         console.error("Server is not available:", error);
-        setIsServerUp(false);
-      }
+        if (!cancelled) setIsServerUp(false);
+      });
+    return () => {
+      cancelled = true;
     };
-
-    // Initial check only
-    checkServerStatusInBackground();
-  }, []); // Empty dependency array - only runs on first render
-
-  // Monitor isServerUp changes
-  useEffect(() => {
-    console.log("isServerUp changed to:", isServerUp);
-  }, [isServerUp]);
+  }, []);
 
   // Load saved messages on mount
   useEffect(() => {
@@ -75,8 +67,6 @@ const ChatInterface: React.FC = () => {
       role: msg.role,
       content: msg.content,
     }));
-
-    console.log(recentMessages);
 
     return recentMessages;
   };
@@ -118,40 +108,15 @@ const ChatInterface: React.FC = () => {
       timestamp: new Date(),
     };
 
+    // Conversation history = prior turns, excluding the message being sent
+    const history = getConversationHistory();
+
     setMessages((prev) => [...prev, userMessage]);
     setIsTyping(true);
 
-    // Get conversation history for context
-    const history = getConversationHistory();
-
-    console.log("isServerUp when send message", isServerUp);
-
-    if (!isServerUp) {
-      // Show offline message immediately
-      const offlineMessageId = `bot-${Date.now()}`;
-      const offlineMessage: Message = {
-        id: offlineMessageId,
-        role: "assistant",
-        content:
-          "Hi! I'm still on beta and using available free credits while we testing the waters. I'm currently pulling the answer from the @[https://linktr.ee/fordevconchapterleads](https://linktr.ee/fordevconchapterleads) and HQ documents. Expect few minutes for a response!",
-        timestamp: new Date(),
-      };
-
-      setLatestMessageId(offlineMessageId);
-      setMessages((prev) => [...prev, offlineMessage]);
-
-      // Send API request after 2 seconds
-      setTimeout(async () => {
-        try {
-          await processMessage(text, history);
-        } catch (error) {
-          console.error("Failed to process message after delay:", error);
-        }
-      }, 2000);
-    } else {
-      // Server is up, process immediately
-      await processMessage(text, history);
-    }
+    // Always send straight to the backend. The typing indicator covers any
+    // cold-start latency, and the request itself warms the server.
+    await processMessage(text, history);
   };
 
   const clearChat = () => {

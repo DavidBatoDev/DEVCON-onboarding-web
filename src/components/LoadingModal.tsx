@@ -22,8 +22,7 @@ const LoadingModal: React.FC<LoadingModalProps> = ({ isOpen }) => {
           </h3>
 
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            I&apos;m still in beta and using available free credits while we test
-            the waters. Answers are pulled from the{" "}
+            Loading the latest{" "}
             <a
               href="https://linktr.ee/fordevconchapterleads"
               target="_blank"
@@ -32,7 +31,7 @@ const LoadingModal: React.FC<LoadingModalProps> = ({ isOpen }) => {
             >
               DEVCON Chapter Resources
             </a>{" "}
-            and HQ documents — expect a few minutes for a response.
+            and HQ documents — this can take a few moments.
           </p>
         </div>
       </div>
