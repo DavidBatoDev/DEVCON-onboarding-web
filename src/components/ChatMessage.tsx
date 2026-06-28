@@ -18,7 +18,6 @@ interface ChatMessageProps {
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
-  isLatest,
   isNewMessage = false,
 }) => {
   const isUser = message.role === "user";
@@ -27,46 +26,48 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     minute: "2-digit",
   });
 
-  // Function to render content with View Document buttons
   const renderContent = (content: string) => {
     return (
       <ReactMarkdown
         components={{
           pre: ({ node, ...props }) => (
-            <div className="bg-gray-800 rounded-lg p-4 my-3 overflow-x-auto">
+            <div className="my-3 overflow-x-auto rounded-lg border border-border bg-secondary/50 p-4">
               <pre
                 {...props}
-                className="text-gray-100 whitespace-pre-wrap break-words font-mono text-sm leading-relaxed"
+                className="whitespace-pre-wrap break-words font-mono text-sm leading-relaxed text-foreground"
               />
             </div>
           ),
           code: ({ node, className, children, ...props }) => (
             <code
-              className="bg-gray-700 text-gray-200 rounded px-1.5 py-0.5 font-mono text-sm"
+              className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[13px] text-foreground"
               {...props}
             >
               {children}
             </code>
           ),
           ul: ({ children, ...props }) => (
-            <ul className="list-disc pl-6 my-3 space-y-2" {...props}>
+            <ul className="my-3 list-disc space-y-1.5 pl-5" {...props}>
               {children}
             </ul>
           ),
           ol: ({ children, ...props }) => (
-            <ol className="list-decimal pl-6 my-3 space-y-2" {...props}>
+            <ol className="my-3 list-decimal space-y-1.5 pl-5" {...props}>
               {children}
             </ol>
           ),
           li: ({ children, ...props }) => (
-            <li className="text-gray-200" {...props}>
+            <li className="text-foreground/90 marker:text-muted-foreground" {...props}>
               {children}
             </li>
           ),
           p: ({ children, ...props }) => (
-            <p className="mb-4 last:mb-0 text-gray-200" {...props}>
+            <p className="mb-3 leading-7 text-foreground/90 last:mb-0" {...props}>
               {children}
             </p>
+          ),
+          hr: ({ node, ...props }) => (
+            <hr className="my-4 border-border" {...props} />
           ),
           a: ({ href, children, ...props }) => {
             const childText =
@@ -84,14 +85,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 ml-2 px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 hover:border-blue-400/50 rounded-lg transition-all duration-200 cursor-pointer hover:scale-105 hover:shadow-md no-underline"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary px-2.5 py-1 text-sm font-medium text-foreground no-underline transition-colors hover:bg-accent"
                   {...props}
                 >
-                  <FileText className="w-4 h-4 text-blue-400" />
-                  <span className="text-sm font-medium text-blue-300">
-                    View Document
-                  </span>
-                  <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
+                  <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>View Document</span>
+                  <ExternalLink className="h-3 w-3 text-muted-foreground" />
                 </a>
               );
             }
@@ -100,23 +99,21 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300 underline"
+                className="text-primary underline-offset-4 hover:underline"
                 {...props}
               >
                 {children}
               </a>
             );
           },
-          strong: ({ children, ...props }) => {
-            return (
-              <strong className="font-semibold" {...props}>
-                {children}
-              </strong>
-            );
-          },
+          strong: ({ children, ...props }) => (
+            <strong className="font-semibold text-foreground" {...props}>
+              {children}
+            </strong>
+          ),
           h1: ({ children, ...props }) => (
             <h1
-              className="text-2xl font-bold mb-4 mt-6 first:mt-0 text-gray-100"
+              className="mb-3 mt-5 text-2xl font-semibold tracking-tight text-foreground first:mt-0"
               {...props}
             >
               {children}
@@ -124,7 +121,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           ),
           h2: ({ children, ...props }) => (
             <h2
-              className="text-xl font-bold mb-3 mt-5 first:mt-0 text-gray-100"
+              className="mb-2 mt-5 text-xl font-semibold tracking-tight text-foreground first:mt-0"
               {...props}
             >
               {children}
@@ -132,7 +129,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           ),
           h3: ({ children, ...props }) => (
             <h3
-              className="text-lg font-bold mb-2 mt-4 first:mt-0 text-gray-100"
+              className="mb-2 mt-4 text-lg font-semibold tracking-tight text-foreground first:mt-0"
               {...props}
             >
               {children}
@@ -145,59 +142,32 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     );
   };
 
+  if (isUser) {
+    return (
+      <div
+        className={cn("flex w-full justify-end", isNewMessage && "animate-fade-in")}
+      >
+        <div className="max-w-[85%] rounded-2xl rounded-br-md bg-secondary px-4 py-2.5 md:max-w-[75%]">
+          <p className="whitespace-pre-wrap text-[15px] leading-7 text-foreground">
+            {message.content}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div
-      className={cn(
-        "flex w-full mb-8 transition-all",
-        isUser ? "justify-end" : "justify-start"
-      )}
-    >
-      <div className={cn("max-w-4xl px-4", isUser ? "w-auto" : "w-full")}>
-        {/* Avatar and name section */}
-        <div
-          className={cn(
-            "flex items-start",
-            isUser ? "justify-end" : "space-x-4"
-          )}
-        >
-          {/* Avatar - only for bot */}
-          {!isUser && (
-            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium bg-secondary text-white">
-              D
-            </div>
-          )}
-
-          {/* Content */}
-          <div className={cn("min-w-0", isUser ? "w-auto" : "flex-1")}>
-            <div
-              className={cn(
-                "mb-2 flex items-center",
-                isUser ? "justify-end" : "justify-start"
-              )}
-            >
-              <div className="font-medium text-gray-100">
-                {isUser ? "You" : "DEBBIE"}
-              </div>
-              <div className="text-xs text-gray-400 ml-2">{formattedTime}</div>
-            </div>
-
-            <div
-              className={cn(
-                "text-base leading-7 text-gray-200",
-                isUser ? "text-right" : "text-left"
-              )}
-            >
-              {isUser ? (
-                <div className="inline-block bg-devcon-purple text-white px-4 py-2 rounded-2xl rounded-tr-md max-w-xs md:max-w-md shadow-lg">
-                  <div className="whitespace-pre-wrap">{message.content}</div>
-                </div>
-              ) : (
-                <div className="prose prose-invert max-w-none text-gray-200">
-                  {renderContent(message.content)}
-                </div>
-              )}
-            </div>
-          </div>
+    <div className={cn("flex w-full gap-4", isNewMessage && "animate-fade-in")}>
+      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold bg-secondary border border-border text-foreground">
+        D
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="mb-1.5 flex items-center gap-2">
+          <span className="text-sm font-medium text-foreground">DEBBIE</span>
+          <span className="text-xs text-muted-foreground">{formattedTime}</span>
+        </div>
+        <div className="markdown-content text-[15px] text-foreground/90">
+          {renderContent(message.content)}
         </div>
       </div>
     </div>

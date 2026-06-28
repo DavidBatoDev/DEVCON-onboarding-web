@@ -1,15 +1,16 @@
-
-import React from 'react';
+import React from "react";
 
 const TypingIndicator = () => {
   return (
-    <div className="flex items-start mb-4">
-      <div className="text-white rounded-lg rounded-tl-none p-4 max-w-[80%] md:max-w-[70%]">
-        <div className="mb-1 font-semibold">DEBBIE</div>
-        <div className="typing-dots">
-          <span className="bg-devcon-yellow"></span>
-          <span className="bg-devcon-orange"></span>
-          <span className="bg-devcon-purple"></span>
+    <div className="flex items-start gap-4 animate-fade-in">
+      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold bg-secondary border border-border text-foreground">
+        D
+      </div>
+      <div className="flex h-8 items-center">
+        <div className="typing-dots flex items-center" aria-label="DEBBIE is typing">
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
       </div>
     </div>

@@ -1,8 +1,6 @@
-
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Send } from 'lucide-react';
+import React, { useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ArrowUp } from "lucide-react";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -10,10 +8,11 @@ interface ChatInputProps {
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
     }
@@ -22,37 +21,56 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
   const handleSubmit = () => {
     if (message.trim() && !isLoading) {
       onSendMessage(message.trim());
-      setMessage('');
+      setMessage("");
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+      }
     }
   };
 
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessage(e.target.value);
+    const el = e.target;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 200)}px`;
+  };
+
+  const canSend = message.trim().length > 0 && !isLoading;
+
   return (
-    <div className="relative w-full max-w-3xl mx-auto">
-      <div className="flex items-end gap-2">
-        <Textarea
-          className="min-h-10 max-h-36 resize-none bg-secondary/30 border-secondary/60 
-                    backdrop-blur-sm rounded-xl transition-all focus-visible:ring-devcon-purple/50
-                    shadow-inner text-white placeholder:text-white/50"
-          placeholder="Send a message..."
+    <div className="w-full max-w-3xl mx-auto">
+      <div className="flex items-end gap-2 rounded-2xl border border-border bg-card px-3 py-2.5 shadow-sm transition-colors focus-within:border-ring/60 focus-within:ring-1 focus-within:ring-ring/30">
+        <textarea
+          ref={textareaRef}
+          className="flex-1 resize-none bg-transparent py-1.5 text-[15px] leading-6 text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50"
+          placeholder="Message DEBBIE…"
+          rows={1}
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={handleInput}
           onKeyDown={handleKeyDown}
           disabled={isLoading}
         />
         <Button
           size="icon"
-          className="h-10 w-10 shrink-0 bg-devcon-purple hover:bg-devcon-purple/90 
-                   rounded-xl transition-all shadow-lg hover:shadow-devcon-purple/50"
+          className="h-8 w-8 shrink-0 rounded-lg"
           onClick={handleSubmit}
-          disabled={!message.trim() || isLoading}
+          disabled={!canSend}
         >
-          <Send className="h-5 w-5" />
+          <ArrowUp className="h-4 w-4" />
           <span className="sr-only">Send</span>
         </Button>
       </div>
-      <div className="mt-2 text-xs text-center text-white/60">
-        Press Enter to send, Shift+Enter for new line
-      </div>
+      <p className="mt-2 text-center text-xs text-muted-foreground">
+        DEBBIE can make mistakes. Press{" "}
+        <kbd className="rounded border border-border bg-secondary px-1 py-0.5 text-[10px] font-medium">
+          Enter
+        </kbd>{" "}
+        to send,{" "}
+        <kbd className="rounded border border-border bg-secondary px-1 py-0.5 text-[10px] font-medium">
+          Shift+Enter
+        </kbd>{" "}
+        for a new line.
+      </p>
     </div>
   );
 };

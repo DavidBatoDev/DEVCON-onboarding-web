@@ -4,9 +4,17 @@ import ChatMessage, { Message } from "./ChatMessage";
 import ChatInput from "./ChatInput";
 import TypingIndicator from "./TypingIndicator";
 import DevconLogo from "./DevconLogo";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Trash2, Sparkles } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { sendMessageToBot, checkServerStatus } from "@/services/chatService";
+
+const SUGGESTED_PROMPTS = [
+  "What's on the new officer onboarding checklist?",
+  "How do I plan my chapter's first event?",
+  "Which tools should our chapter use to stay organized?",
+  "Share best practices for growing chapter membership",
+];
 
 const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -14,27 +22,6 @@ const ChatInterface: React.FC = () => {
   const [latestMessageId, setLatestMessageId] = useState<string | null>(null);
   const [isServerUp, setIsServerUp] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const welcomeMessage: Message = {
-    id: "welcome",
-    role: "assistant",
-    content: [
-      "**🎉 Hey there, Officer! 🎉**",
-      "Welcome aboard the **DEBBIE — DEVCON Officer Onboarding Bot** — your cheerful sidekick on this exciting tech adventure! 💻✨",
-      "",
-      "I'm here to help you kickstart your journey with:",
-      "- 📋 **Checklists** to keep you on track",
-      "- 📚 **Guides and best practices**",
-      "- 🛠️ **Tools** to lead your chapter smoothly",
-      "- 🎯 **Tips** to turn ideas into action**",
-      "",
-      "So buckle up, future tech leader — your chapter is waiting, and I've got your back every step of the way.",
-      "**Ready to roll? Let's do this! 🚀😄**",
-      "",
-      "---",
-    ].join("\n"),
-    timestamp: new Date(),
-  };
 
   // Check server status on first render only
   useEffect(() => {
@@ -65,8 +52,6 @@ const ChatInterface: React.FC = () => {
     const saved = localStorage.getItem("devcon-chat-history");
     if (saved) {
       setMessages(JSON.parse(saved));
-    } else {
-      setMessages([welcomeMessage]);
     }
   }, []);
 
@@ -85,14 +70,11 @@ const ChatInterface: React.FC = () => {
     role: string;
     content: string;
   }> => {
-    // Get last 10 messages (excluding welcome message) for context
-    const recentMessages = messages
-      .filter((msg) => msg.id !== "welcome")
-      .slice(-10)
-      .map((msg) => ({
-        role: msg.role,
-        content: msg.content,
-      }));
+    // Get last 10 messages for context
+    const recentMessages = messages.slice(-10).map((msg) => ({
+      role: msg.role,
+      content: msg.content,
+    }));
 
     console.log(recentMessages);
 
@@ -173,7 +155,7 @@ const ChatInterface: React.FC = () => {
   };
 
   const clearChat = () => {
-    setMessages([welcomeMessage]);
+    setMessages([]);
     setLatestMessageId(null);
     localStorage.removeItem("devcon-chat-history");
     toast({
@@ -182,47 +164,85 @@ const ChatInterface: React.FC = () => {
     });
   };
 
+  const isEmpty = messages.length === 0;
+
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-devcon-background to-devcon-background/90">
-      <header className="flex items-center justify-between px-4 py-3 border-b border-border backdrop-blur-md bg-black/30 shadow-md">
-        <div className="flex items-center gap-4">
-          <Link
-            to="/devcon"
-            className="flex items-center text-muted-foreground hover:text-white transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            <span className="text-sm">Back to Home</span>
-          </Link>
+    <div className="flex h-screen flex-col bg-background">
+      <header className="z-10 flex items-center justify-between border-b border-border bg-card/80 px-4 py-3 backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
+            <Link to="/devcon">
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Home</span>
+            </Link>
+          </Button>
+          <div className="h-5 w-px bg-border" />
           <DevconLogo />
+          <div className="ml-1 hidden items-center gap-1.5 sm:flex">
+            <span className="text-sm font-medium text-foreground">DEBBIE</span>
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${
+                isServerUp ? "bg-emerald-500" : "bg-amber-500"
+              }`}
+              title={isServerUp ? "Online" : "Connecting…"}
+            />
+          </div>
         </div>
-        <button
+        <Button
+          variant="outline"
+          size="sm"
           onClick={clearChat}
-          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-white transition-colors bg-black/20 px-3 py-1 rounded-full"
+          disabled={isEmpty}
+          className="text-muted-foreground"
         >
           <Trash2 className="h-3.5 w-3.5" />
-          <span>Clear Chat</span>
-        </button>
+          <span className="hidden sm:inline">Clear chat</span>
+        </Button>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="max-w-3xl mx-auto space-y-6">
-          {messages.map((msg, idx) => (
-            <ChatMessage
-              key={msg.id}
-              message={msg}
-              isLatest={idx === messages.length - 1}
-              isNewMessage={msg.id === latestMessageId}
-            />
-          ))}
-          {isTyping && <TypingIndicator />}
-          <div ref={messagesEndRef} />
-        </div>
+      <div className="flex-1 overflow-y-auto">
+        {isEmpty && !isTyping ? (
+          <div className="mx-auto flex h-full max-w-2xl flex-col items-center justify-center px-4 py-10 text-center">
+            <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card">
+              <Sparkles className="h-6 w-6 text-primary" />
+            </div>
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+              Hi, I&apos;m DEBBIE
+            </h1>
+            <p className="mt-3 max-w-md text-[15px] leading-7 text-muted-foreground">
+              Your DEVCON officer onboarding assistant. Ask me about checklists,
+              guides, tools, and best practices for leading your chapter.
+            </p>
+            <div className="mt-8 grid w-full grid-cols-1 gap-2.5 sm:grid-cols-2">
+              {SUGGESTED_PROMPTS.map((prompt) => (
+                <button
+                  key={prompt}
+                  onClick={() => handleSendMessage(prompt)}
+                  className="rounded-xl border border-border bg-card px-4 py-3 text-left text-sm text-foreground/90 transition-colors hover:border-ring/50 hover:bg-accent"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="mx-auto max-w-3xl space-y-6 px-4 py-6">
+            {messages.map((msg, idx) => (
+              <ChatMessage
+                key={msg.id}
+                message={msg}
+                isLatest={idx === messages.length - 1}
+                isNewMessage={msg.id === latestMessageId}
+              />
+            ))}
+            {isTyping && <TypingIndicator />}
+            <div ref={messagesEndRef} />
+          </div>
+        )}
       </div>
 
-      <div className="bg-transparent py-4">
-        <div className="w-full max-w-3xl mx-auto px-4">
-          <ChatInput onSendMessage={handleSendMessage} isLoading={isTyping} />
-        </div>
+      <div className="border-t border-border bg-background px-4 py-4">
+        <ChatInput onSendMessage={handleSendMessage} isLoading={isTyping} />
       </div>
     </div>
   );
