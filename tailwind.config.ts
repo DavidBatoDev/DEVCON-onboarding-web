@@ -19,6 +19,27 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: [
+					'Inter',
+					'ui-sans-serif',
+					'system-ui',
+					'-apple-system',
+					'Segoe UI',
+					'Roboto',
+					'Helvetica Neue',
+					'Arial',
+					'sans-serif',
+				],
+				mono: [
+					'ui-monospace',
+					'SFMono-Regular',
+					'Menlo',
+					'Consolas',
+					'Liberation Mono',
+					'monospace',
+				],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -58,7 +79,7 @@ export default {
 					orange: '#F97316',
 					purple: '#7E22CE',
 					green: '#65A30D',
-					background: '#1A1F2C'
+					background: '#111113'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',

@@ -1,48 +1,39 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 225 27% 14%;
-    --foreground: 0 0% 100%;
+    /* Refined dark, neutral cool-gray scale + single yellow accent */
+    --background: 240 6% 7%;
+    --foreground: 0 0% 98%;
 
-    --card: 225 27% 14%;
-    --card-foreground: 0 0% 100%;
+    --card: 240 5% 10%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 225 27% 14%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 240 5% 10%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 0 0% 100%;
-    --primary-foreground: 225 27% 14%;
+    --primary: 47 92% 59%;
+    --primary-foreground: 240 8% 10%;
 
-    --secondary: 220 14% 22%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 240 4% 14%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 220 14% 22%;
-    --muted-foreground: 0 0% 75%;
+    --muted: 240 4% 14%;
+    --muted-foreground: 240 5% 64%;
 
-    --accent: 220 14% 22%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 240 4% 16%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 85% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 220 14% 22%;
-    --input: 220 14% 22%;
-    --ring: 0 0% 100%;
+    --border: 240 5% 16%;
+    --input: 240 5% 18%;
+    --ring: 47 92% 59%;
 
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --radius: 0.625rem;
   }
 }
 
@@ -52,43 +43,66 @@
   }
 
   body {
-    @apply bg-devcon-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   html {
     @apply scroll-smooth;
   }
+
+  h1, h2, h3, h4 {
+    @apply tracking-tight;
+  }
+
+  /* Refined scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 9999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(240 5% 24%);
+  }
 }
 
+/* Typing indicator — neutral, single-color */
 .typing-dots span {
-  @apply inline-block w-1.5 h-1.5 rounded-full mx-0.5;
-  animation: pulse 1s infinite;
+  @apply inline-block w-1.5 h-1.5 rounded-full mx-0.5 bg-muted-foreground;
+  animation: typing-bounce 1.2s infinite ease-in-out;
 }
-
 .typing-dots span:nth-child(2) {
-  animation-delay: 0.2s;
+  animation-delay: 0.15s;
 }
-
 .typing-dots span:nth-child(3) {
-  animation-delay: 0.4s;
+  animation-delay: 0.3s;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(0.8);
+@keyframes typing-bounce {
+  0%, 60%, 100% {
+    opacity: 0.35;
+    transform: translateY(0);
   }
-  50% {
+  30% {
     opacity: 1;
-    transform: scale(1.2);
+    transform: translateY(-3px);
   }
 }
 
-/* Add fade-in animation */
+/* Subtle entrance animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -97,44 +111,13 @@
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeIn 0.3s ease-out forwards;
 }
 
-/* Floating animation */
-@keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-.animate-float {
-  animation: float 4s ease-in-out infinite;
-}
-
-/* Glow animation */
-@keyframes glow {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(248, 210, 53, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(248, 210, 53, 0.6);
-  }
-}
-
-.animate-glow {
-  animation: glow 3s ease-in-out infinite;
-}
-
-/* Section transition animations */
+/* Scroll-reveal sections on the landing page */
 .section-fade-in {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(16px);
   transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 
@@ -143,45 +126,25 @@
   transform: translateY(0);
 }
 
-/* Tab styles for chapters section */
-.tabs-container {
-  @apply bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
-.tabs-header {
-  @apply flex space-x-2 border-b border-white/10 mb-4;
-}
-
-.tab-button {
-  @apply px-4 py-2 text-white/60 hover:text-white transition-colors;
-}
-
-.tab-button.active {
-  @apply text-devcon-yellow border-b-2 border-devcon-yellow;
-}
-
-.tab-content {
-  @apply hidden;
-}
-
-.tab-content.active {
-  @apply block animate-fade-in;
-}
-
-.markdown-content pre {
-  @apply bg-secondary p-3 rounded-md overflow-auto my-2;
-}
-
-.markdown-content code {
-  @apply font-mono text-sm;
-}
-
+/* Markdown / prose styling (assistant messages) */
 .markdown-content p {
-  @apply my-2;
+  @apply my-3 leading-7;
 }
 
-.markdown-content ul, .markdown-content ol {
-  @apply pl-5 my-2;
+.markdown-content ul,
+.markdown-content ol {
+  @apply pl-5 my-3 space-y-1.5;
 }
 
 .markdown-content ul {
@@ -192,9 +155,11 @@
   @apply list-decimal;
 }
 
-.markdown-content h1, .markdown-content h2, .markdown-content h3, 
-.markdown-content h4, .markdown-content h5, .markdown-content h6 {
-  @apply font-bold my-3;
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  @apply font-semibold tracking-tight mt-5 mb-2 text-foreground;
 }
 
 .markdown-content h1 {
@@ -207,4 +172,20 @@
 
 .markdown-content h3 {
   @apply text-lg;
+}
+
+.markdown-content pre {
+  @apply bg-card border border-border p-4 rounded-lg overflow-auto my-3;
+}
+
+.markdown-content code {
+  @apply font-mono text-sm;
+}
+
+.markdown-content a {
+  @apply text-primary underline-offset-4 hover:underline;
+}
+
+.markdown-content hr {
+  @apply border-border my-4;
 }
