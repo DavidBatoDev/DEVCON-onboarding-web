@@ -7,7 +7,11 @@ import DevconLogo from "./DevconLogo";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Trash2, Sparkles } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { sendMessageToBot, checkServerStatus } from "@/services/chatService";
+import {
+  sendMessageToBot,
+  streamMessageToBot,
+  checkServerStatus,
+} from "@/services/chatService";
 
 const SUGGESTED_PROMPTS = [
   "What's on the new officer onboarding checklist?",
@@ -75,26 +79,54 @@ const ChatInterface: React.FC = () => {
     text: string,
     history: Array<{ role: string; content: string }>
   ) => {
+    const botMessageId = `bot-${Date.now()}`;
+    let created = false;
+
+    // Append the streamed delta to the assistant message, creating the bubble on
+    // the first token (until then the typing indicator is shown).
+    const appendDelta = (delta: string) => {
+      if (!created) {
+        created = true;
+        setIsTyping(false);
+        setLatestMessageId(botMessageId);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: botMessageId,
+            role: "assistant",
+            content: delta,
+            timestamp: new Date(),
+          },
+        ]);
+      } else {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === botMessageId ? { ...m, content: m.content + delta } : m
+          )
+        );
+      }
+    };
+
     try {
-      const data = await sendMessageToBot(text, history);
-
-      const botMessageId = `bot-${Date.now()}`;
-      const botMessage: Message = {
-        id: botMessageId,
-        role: "assistant",
-        content: data.answer || "⚠️ No answer provided.",
-        timestamp: new Date(),
-      };
-
-      setLatestMessageId(botMessageId);
-      setMessages((prev) => [...prev, botMessage]);
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: "Error",
-        description: "Something went wrong while contacting the bot.",
-        variant: "destructive",
-      });
+      await streamMessageToBot(text, history, appendDelta);
+      if (!created) {
+        // Stream finished with no content — surface a graceful message.
+        appendDelta("⚠️ No answer provided.");
+      }
+    } catch (streamError) {
+      console.error("Streaming failed, falling back to non-streaming:", streamError);
+      // Fallback: one-shot request so a streaming hiccup doesn't drop the answer.
+      try {
+        const data = await sendMessageToBot(text, history);
+        appendDelta(data.answer || "⚠️ No answer provided.");
+      } catch (error) {
+        console.error(error);
+        toast({
+          title: "Error",
+          description: "Something went wrong while contacting the bot.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsTyping(false);
     }

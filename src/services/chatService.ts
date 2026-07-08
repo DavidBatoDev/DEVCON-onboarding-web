@@ -41,6 +41,42 @@ export const checkServerStatus = async (): Promise<ServerStatus> => {
   }
 };
 
+export const streamMessageToBot = async (
+  message: string,
+  history: ChatHistory[] = [],
+  onToken: (delta: string) => void,
+  signal?: AbortSignal
+): Promise<void> => {
+  const response = await fetch(getApiUrl("/api/v1/ask/stream"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: message,
+      history: history,
+    }),
+    signal,
+  });
+
+  if (!response.ok || !response.body) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const chunk = decoder.decode(value, { stream: true });
+    if (chunk) onToken(chunk);
+  }
+  // Flush any remaining bytes from the decoder.
+  const tail = decoder.decode();
+  if (tail) onToken(tail);
+};
+
 export const sendMessageToBot = async (
   message: string,
   history: ChatHistory[] = []
