@@ -92,6 +92,14 @@ const ChatInterface: React.FC = () => {
     const botMessageId = `bot-${Date.now()}`;
     let created = false;
     let sawError: string | null = null;
+    // `meta` arrives immediately (before retrieval); `sources`/`token` only
+    // after retrieval + first token (~2-4s). We stash meta and DON'T create
+    // the bubble yet, so the typing indicator stays up during that gap —
+    // otherwise the user sees an empty bubble with a full action row.
+    let pendingRequestId: string | undefined;
+    // Sources/badge are stashed and only revealed on `done`, so the answer
+    // streams first and all source UI appears together when it's complete.
+    let pendingSources: Partial<Message> | undefined;
 
     const ensureBubble = () => {
       if (created) return;
@@ -105,6 +113,7 @@ const ChatInterface: React.FC = () => {
           role: "assistant",
           content: "",
           timestamp: new Date(),
+          requestId: pendingRequestId,
         },
       ]);
     };
@@ -112,20 +121,20 @@ const ChatInterface: React.FC = () => {
     const onEvent = (evt: StreamEvent) => {
       switch (evt.type) {
         case "meta":
-          ensureBubble();
-          patchMessage(botMessageId, { requestId: evt.request_id });
+          // Keep the typing indicator; create the bubble on first content.
+          pendingRequestId = evt.request_id;
           break;
         case "sources":
-          // Sources arrive BEFORE tokens — mount cards + badge immediately.
-          ensureBubble();
-          patchMessage(botMessageId, {
+          // Stash — sources/badge are only revealed once the answer completes.
+          pendingSources = {
             sources: evt.sources,
             grounded: evt.grounded,
             confidence: evt.confidence,
-          });
+          };
           break;
         case "token":
         case "legacy-token":
+          // First token creates the bubble; the answer streams on its own.
           ensureBubble();
           setMessages((prev) =>
             prev.map((m) =>
@@ -134,11 +143,17 @@ const ChatInterface: React.FC = () => {
           );
           break;
         case "done":
-          // Swap in the citation-sanitized final answer (usually identical).
+          // Answer complete — swap in the sanitized text AND reveal sources +
+          // badge together (so citation chips have targets to scroll to).
+          ensureBubble();
           setMessages((prev) =>
             prev.map((m) =>
-              m.id === botMessageId && evt.answer && m.content !== evt.answer
-                ? { ...m, content: evt.answer }
+              m.id === botMessageId
+                ? {
+                    ...m,
+                    content: evt.answer || m.content,
+                    ...(pendingSources ?? {}),
+                  }
                 : m
             )
           );
