@@ -1,31 +1,38 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import ChatMessage, { Message } from "./ChatMessage";
 import ChatInput from "./ChatInput";
 import TypingIndicator from "./TypingIndicator";
 import DevconLogo from "./DevconLogo";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Trash2, Sparkles } from "lucide-react";
+import { ArrowLeft, FlaskConical, Trash2, Sparkles } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import {
   sendMessageToBot,
   streamMessageToBot,
   checkServerStatus,
 } from "@/services/chatService";
+import type { StreamEvent } from "@/types/chat";
 
 const SUGGESTED_PROMPTS = [
   "What's on the new officer onboarding checklist?",
   "How do I plan my chapter's first event?",
-  "Which tools should our chapter use to stay organized?",
+  "How do I apply for the DEVCON internship?",
   "Share best practices for growing chapter membership",
 ];
+
+// v2: message shape gained sources/grounded/etc. — old saved histories lack
+// them, so a clean key keeps parsing simple.
+const STORAGE_KEY = "devcon-chat-history-v2";
 
 const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [latestMessageId, setLatestMessageId] = useState<string | null>(null);
   const [isServerUp, setIsServerUp] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   // Check real server status on mount (drives the header status dot)
   useEffect(() => {
@@ -45,15 +52,19 @@ const ChatInterface: React.FC = () => {
 
   // Load saved messages on mount
   useEffect(() => {
-    const saved = localStorage.getItem("devcon-chat-history");
+    const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
-      setMessages(JSON.parse(saved));
+      try {
+        setMessages(JSON.parse(saved));
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+      }
     }
   }, []);
 
   // Save messages when they change
   useEffect(() => {
-    localStorage.setItem("devcon-chat-history", JSON.stringify(messages));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
   }, [messages]);
 
   // Scroll to bottom on new messages or typing state
@@ -62,63 +73,110 @@ const ChatInterface: React.FC = () => {
   }, [messages, isTyping]);
 
   // Helper function to get conversation history for context
-  const getConversationHistory = (): Array<{
-    role: string;
-    content: string;
-  }> => {
-    // Get last 10 messages for context
-    const recentMessages = messages.slice(-10).map((msg) => ({
-      role: msg.role,
-      content: msg.content,
-    }));
+  const getConversationHistory = (
+    msgs: Message[]
+  ): Array<{ role: string; content: string }> =>
+    msgs.slice(-10).map((msg) => ({ role: msg.role, content: msg.content }));
 
-    return recentMessages;
+  const patchMessage = (id: string, patch: Partial<Message>) => {
+    setMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, ...patch } : m))
+    );
   };
 
   const processMessage = async (
     text: string,
-    history: Array<{ role: string; content: string }>
+    history: Array<{ role: string; content: string }>,
+    nocache = false
   ) => {
     const botMessageId = `bot-${Date.now()}`;
     let created = false;
+    let sawError: string | null = null;
 
-    // Append the streamed delta to the assistant message, creating the bubble on
-    // the first token (until then the typing indicator is shown).
-    const appendDelta = (delta: string) => {
-      if (!created) {
-        created = true;
-        setIsTyping(false);
-        setLatestMessageId(botMessageId);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: botMessageId,
-            role: "assistant",
-            content: delta,
-            timestamp: new Date(),
-          },
-        ]);
-      } else {
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === botMessageId ? { ...m, content: m.content + delta } : m
-          )
-        );
+    const ensureBubble = () => {
+      if (created) return;
+      created = true;
+      setIsTyping(false);
+      setLatestMessageId(botMessageId);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: botMessageId,
+          role: "assistant",
+          content: "",
+          timestamp: new Date(),
+        },
+      ]);
+    };
+
+    const onEvent = (evt: StreamEvent) => {
+      switch (evt.type) {
+        case "meta":
+          ensureBubble();
+          patchMessage(botMessageId, { requestId: evt.request_id });
+          break;
+        case "sources":
+          // Sources arrive BEFORE tokens — mount cards + badge immediately.
+          ensureBubble();
+          patchMessage(botMessageId, {
+            sources: evt.sources,
+            grounded: evt.grounded,
+            confidence: evt.confidence,
+          });
+          break;
+        case "token":
+        case "legacy-token":
+          ensureBubble();
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === botMessageId ? { ...m, content: m.content + evt.text } : m
+            )
+          );
+          break;
+        case "done":
+          // Swap in the citation-sanitized final answer (usually identical).
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === botMessageId && evt.answer && m.content !== evt.answer
+                ? { ...m, content: evt.answer }
+                : m
+            )
+          );
+          break;
+        case "error":
+          sawError = evt.message;
+          break;
       }
     };
 
+    const controller = new AbortController();
+    abortRef.current = controller;
+    setIsStreaming(true);
+
     try {
-      await streamMessageToBot(text, history, appendDelta);
+      await streamMessageToBot(text, history, onEvent, controller.signal, nocache);
+      if (sawError) throw new Error(sawError);
       if (!created) {
-        // Stream finished with no content — surface a graceful message.
-        appendDelta("⚠️ No answer provided.");
+        ensureBubble();
+        patchMessage(botMessageId, { content: "⚠️ No answer provided." });
       }
     } catch (streamError) {
+      if (controller.signal.aborted) {
+        // User pressed stop — keep the partial answer, mark it.
+        if (created) patchMessage(botMessageId, { stopped: true });
+        return;
+      }
       console.error("Streaming failed, falling back to non-streaming:", streamError);
-      // Fallback: one-shot request so a streaming hiccup doesn't drop the answer.
       try {
-        const data = await sendMessageToBot(text, history);
-        appendDelta(data.answer || "⚠️ No answer provided.");
+        const data = await sendMessageToBot(text, history, nocache);
+        ensureBubble();
+        patchMessage(botMessageId, {
+          content: data.answer || "⚠️ No answer provided.",
+          sources: data.metadata?.sources,
+          grounded: data.metadata?.grounded,
+          confidence: data.metadata?.confidence,
+          requestId: data.metadata?.request_id,
+        });
       } catch (error) {
         console.error(error);
         toast({
@@ -128,7 +186,9 @@ const ChatInterface: React.FC = () => {
         });
       }
     } finally {
+      abortRef.current = null;
       setIsTyping(false);
+      setIsStreaming(false);
     }
   };
 
@@ -141,20 +201,42 @@ const ChatInterface: React.FC = () => {
     };
 
     // Conversation history = prior turns, excluding the message being sent
-    const history = getConversationHistory();
+    const history = getConversationHistory(messages);
 
     setMessages((prev) => [...prev, userMessage]);
     setIsTyping(true);
 
-    // Always send straight to the backend. The typing indicator covers any
-    // cold-start latency, and the request itself warms the server.
     await processMessage(text, history);
+  };
+
+  const handleStop = useCallback(() => {
+    abortRef.current?.abort();
+    setIsTyping(false);
+  }, []);
+
+  const handleRegenerate = async () => {
+    // Drop the trailing assistant message, resend the last user text (cache-busted).
+    if (isTyping || isStreaming) return;
+    const lastUser = [...messages].reverse().find((m) => m.role === "user");
+    if (!lastUser) return;
+    const last = messages[messages.length - 1];
+    const trimmed =
+      last?.role === "assistant"
+        ? messages.slice(0, -1)
+        : messages;
+    setMessages(trimmed);
+    setIsTyping(true);
+    // History = turns before the user message being re-asked.
+    const history = getConversationHistory(
+      trimmed.filter((m) => m.id !== lastUser.id)
+    );
+    await processMessage(lastUser.content, history, true);
   };
 
   const clearChat = () => {
     setMessages([]);
     setLatestMessageId(null);
-    localStorage.removeItem("devcon-chat-history");
+    localStorage.removeItem(STORAGE_KEY);
     toast({
       title: "Chat cleared.",
       description: "Your conversation history has been cleared.",
@@ -185,16 +267,24 @@ const ChatInterface: React.FC = () => {
             />
           </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={clearChat}
-          disabled={isEmpty}
-          className="text-muted-foreground"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Clear chat</span>
-        </Button>
+        <div className="flex items-center gap-1.5">
+          <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
+            <Link to="/playground">
+              <FlaskConical className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Playground</span>
+            </Link>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={clearChat}
+            disabled={isEmpty}
+            className="text-muted-foreground"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Clear chat</span>
+          </Button>
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto">
@@ -230,6 +320,14 @@ const ChatInterface: React.FC = () => {
                 message={msg}
                 isLatest={idx === messages.length - 1}
                 isNewMessage={msg.id === latestMessageId}
+                onRegenerate={
+                  msg.role === "assistant" &&
+                  idx === messages.length - 1 &&
+                  !isTyping &&
+                  !isStreaming
+                    ? handleRegenerate
+                    : undefined
+                }
               />
             ))}
             {isTyping && <TypingIndicator />}
@@ -239,7 +337,11 @@ const ChatInterface: React.FC = () => {
       </div>
 
       <div className="border-t border-border bg-background px-4 py-4">
-        <ChatInput onSendMessage={handleSendMessage} isLoading={isTyping} />
+        <ChatInput
+          onSendMessage={handleSendMessage}
+          isLoading={isTyping || isStreaming}
+          onStop={handleStop}
+        />
       </div>
     </div>
   );

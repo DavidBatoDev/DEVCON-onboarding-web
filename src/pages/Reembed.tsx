@@ -24,11 +24,16 @@ const DriveFilesFetcher = () => {
   const [stats, setStats] = useState(null);
   const [isRebuilding, setIsRebuilding] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState(new Set());
+  // Local-admin console: the backend requires X-Admin-Token for Drive endpoints.
+  const [adminToken, setAdminToken] = useState(
+    () => localStorage.getItem("devcon-admin-token") || ""
+  );
+  useEffect(() => {
+    localStorage.setItem("devcon-admin-token", adminToken);
+  }, [adminToken]);
 
   // API base URL - adjust this to match your backend
-  const API_BASE =
-    import.meta.env.VITE_BACKEND_URL ||
-    "https://devcon-onboarding-rag.onrender.com";
+  const API_BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
   // Ensure the URL doesn't end with a slash to avoid double slashes
   const getApiUrl = (endpoint: string) => {
@@ -59,6 +64,7 @@ const DriveFilesFetcher = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-Admin-Token": adminToken,
         },
         body: JSON.stringify({
           folder_id: folderId,
@@ -117,6 +123,7 @@ const DriveFilesFetcher = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-Admin-Token": adminToken,
         },
         body: JSON.stringify(rebuildPayload),
       });
@@ -306,6 +313,14 @@ const DriveFilesFetcher = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              <input
+                type="password"
+                value={adminToken}
+                onChange={(e) => setAdminToken(e.target.value)}
+                placeholder="Admin token"
+                className="h-8 w-36 rounded-md border border-border bg-card px-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring/40"
+                title="X-Admin-Token required by the backend for Drive endpoints (local use)"
+              />
               <div className="mr-1 flex items-center gap-2 text-sm text-muted-foreground">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 <span>Connected</span>

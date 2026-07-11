@@ -1,13 +1,14 @@
 import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Square } from "lucide-react";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isLoading: boolean;
+  onStop?: () => void;
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, onStop }) => {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -50,15 +51,28 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
           onKeyDown={handleKeyDown}
           disabled={isLoading}
         />
-        <Button
-          size="icon"
-          className="h-8 w-8 shrink-0 rounded-lg"
-          onClick={handleSubmit}
-          disabled={!canSend}
-        >
-          <ArrowUp className="h-4 w-4" />
-          <span className="sr-only">Send</span>
-        </Button>
+        {isLoading && onStop ? (
+          <Button
+            size="icon"
+            variant="secondary"
+            className="h-8 w-8 shrink-0 rounded-lg"
+            onClick={onStop}
+            title="Stop generating"
+          >
+            <Square className="h-3.5 w-3.5" />
+            <span className="sr-only">Stop</span>
+          </Button>
+        ) : (
+          <Button
+            size="icon"
+            className="h-8 w-8 shrink-0 rounded-lg"
+            onClick={handleSubmit}
+            disabled={!canSend}
+          >
+            <ArrowUp className="h-4 w-4" />
+            <span className="sr-only">Send</span>
+          </Button>
+        )}
       </div>
       <p className="mt-2 text-center text-xs text-muted-foreground">
         DEBBIE can make mistakes. Press{" "}

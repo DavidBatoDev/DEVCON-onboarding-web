@@ -644,7 +644,7 @@ const Landing: React.FC = () => {
                     placeholder="Juan Dela Cruz"
                     onChange={(e) => {
                       if (e.target.value.toLowerCase() === "reembed") {
-                        navigate("/reembed");
+                        navigate("/admin/reembed");
                       }
                     }}
                   />
